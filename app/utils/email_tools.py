@@ -3,11 +3,11 @@ import requests
 import json
 import os
 
-domain_name = os.getenv("DOMAIN_NAME", "kincamp.com")
+domain_name = os.getenv("DOMAIN_NAME", "lytcamp.com.mx")
 MAILGUN_SENDING_KEY = os.getenv("MAILGUN_SENDING_KEY")
 
 
-from_user_email = "Kin Camp <sistemas@kincamp.com>"
+from_user_email = "Lago y Tierra <contacto@lytcamp.org.mx>"
 to_user_email = ""
 
 
