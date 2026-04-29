@@ -371,16 +371,12 @@ def get_camper_in_camp_by_camper_camp(db: Session, camper_id: int, camp_id: int)
             and_(
                 CamperInCamp.camper_id == camper_id,
                 CamperInCamp.camp_id == camp_id,
-                CamperInCamp.status == CAMP_STATUS_ENROLLED_ID,
+                # CamperInCamp.status == CAMP_STATUS_ENROLLED_ID,
             )
         )
         .first()
     )
-    if camper_in_camp:
-        return camper_in_camp
-    else:
-        return False
-    
+    return camper_in_camp
 def get_payment_page_camper_in_camp(
     db, camper_id: int, camp_id: int, camper_in_camp_id: int
 ):
@@ -402,8 +398,7 @@ def get_payment_page_camper_in_camp(
 
     else:
         camper_in_camp = get_camper_in_camp_by_camper_camp(db, camper_id, camp_id)
-        print(camper_in_camp)
-        camper_in_camp_id = getattr(camper_in_camp, "id")
+        camper_in_camp_id = camper_in_camp.id
 
     # payment_table = get_payment_by_camper_camp(db, camper_id, camp_id)
     camper_payments_in_camp =  get_camper_payments_in_camp(db, camper_id, camp_id)

@@ -40,9 +40,10 @@ class CampCreate(BaseModel):
     registration: bool = Field(
         title="Registro abierto"
     )
-    url: str = Field(
+    url: Optional[str] = Field(
         title="Pagina web para mas información",
-        max_lenght= 150
+        max_lenght= 150,
+        default=None
     )
     special_message: str = Field(
         title="Mensaje para titulares de la cuenta."
@@ -83,11 +84,13 @@ class CampCreate(BaseModel):
         title="Punto de reunión",
         max_lenght= 150
     )
-    photo_url: str = Field(
-        title="Url para la galeria de fotos"
+    photo_url: Optional[str] = Field(
+        title="Url para la galeria de fotos",
+        default=None
     )
-    photo_password: str = Field(
-        title="Contraseña para galeria de fotos"
+    photo_password: Optional[str] = Field(
+        title="Contraseña para galeria de fotos",
+        default="Por confirmar"
     )
     medical_report: str = Field(
         title="Reporte medico"
