@@ -1063,6 +1063,8 @@ def update_camp_by_id(db: Session, camp_id: int, modify_camp):
     try:
         extra_charges = [extra_charge.dict(exclude_unset=True) for extra_charge in modify_camp.extra_charges]
         extra_questions = [extra_question.dict(exclude_unset=True) for extra_question in modify_camp.extra_question]
+        camp_payment_accounts = [camp_payment_account.dict(exclude_unset=True) for camp_payment_account in modify_camp.payment_accounts]
+        
         
         campers_in_camp = (db.query(CamperInCamp, Camper, Camp)
                 .select_from(CamperInCamp)
@@ -1089,15 +1091,47 @@ def update_camp_by_id(db: Session, camp_id: int, modify_camp):
         current_camp_extra_questions = db.execute(current_camp_extra_questions_query)
         current_camp_extra_questions = current_camp_extra_questions.mappings().all()
         
+        current_camp_payment_accounts_query = (
+            db.query(CampPaymentAccount.id, CampPaymentAccount.camp_id, CampPaymentAccount.paymentaccount_id)
+            .select_from(CampPaymentAccount)
+            .filter(CampPaymentAccount.camp_id == camp_id)
+        )
+        current_camp_payment_accounts = db.execute(current_camp_payment_accounts_query)
+        current_camp_payment_accounts = current_camp_payment_accounts.mappings().all()
+        
+        ids_payment_accounts = set()        
+        for item in current_camp_payment_accounts:
+                ids_payment_accounts.add(item["paymentaccount_id"])
+        camp_payment_accounts_to_add = [item for item in camp_payment_accounts if item["id"] not in ids_payment_accounts] 
+        
+        ids_current_camp_payment_accounts = set()
+        for item in camp_payment_accounts:
+            if "id" in item:
+                ids_current_camp_payment_accounts.add(item["id"])
+        camp_payment_accounts_to_be_deleted = [item for item in current_camp_payment_accounts if item["paymentaccount_id"] not in ids_current_camp_payment_accounts]
+        
+        
+         # delete camp payment accounts       
+        for camp_payment_account_to_be_deleted in camp_payment_accounts_to_be_deleted:
+            camp_payment_account_deleted = (db.query(CampPaymentAccount).filter(CampPaymentAccount.paymentaccount_id == camp_payment_account_to_be_deleted["paymentaccount_id"]).delete(synchronize_session = 'fetch'))
+        
+         # add camp payment accounts       
+        for camp_payment_account_to_be_added in camp_payment_accounts_to_add:
+            camp_payment_account_added = CampPaymentAccount(
+                camp_id=camp_id,
+                paymentaccount_id=camp_payment_account_to_be_added["id"]
+            )
+            db.add(camp_payment_account_added)
+        
+        
+        
+        
         ids_current_extra_question = set()        
         for item in extra_questions:
             if "id" in item:
                 ids_current_extra_question.add(item["id"])        
         camp_extra_questions_to_be_deleted = [item for item in current_camp_extra_questions if item["id"] not in ids_current_extra_question]
 
-
-
-        print(current_camp_extra_charges)
 
         ids_a = set()        
         for item in extra_charges:
