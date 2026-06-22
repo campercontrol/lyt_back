@@ -496,8 +496,53 @@ def staff_dashboard(db, staff_id: int):
 
 
 def get_staff_by_id(db, staff_id: int):
-    staff = db.query(Staff).filter_by(id=staff_id).first()
-    return staff
+    query = (
+        db.query(
+            Staff.id,
+            Staff.name,
+            Staff.lastname_father,
+            Staff.lastname_mother,
+            Constant.value.label("gender"),
+            Staff.gender_id,
+            Staff.photo,
+            Staff.curp,
+            Staff.rfc,
+            Staff.cellphone,
+            Staff.home_phone,
+            Staff.birthday,
+            Staff.affliction,
+            Staff.blood_type,
+            Staff.drug_allergies,
+            Staff.other_allergies,
+            Staff.nocturnal_disorders,
+            Staff.phobias,
+            Staff.drugs,
+            Staff.prohibited_foods,
+            Staff.bio,
+            Staff.comments,
+            Staff.employee,
+            Staff.coordinator,
+            Staff.cv,
+            Staff.facebook,
+            Staff.staff_contact_name,
+            Staff.staff_contact_relation,
+            Staff.staff_contact_homephone,
+            Staff.staff_contact_cellphone,
+            Staff.employee_email_send,
+            Staff.login_id,
+            Staff.record_id,
+            Staff.season_id,
+            Season.name.label("season"),
+            Staff.created_at,
+            Staff.updated_at,
+        ).select_from(Staff)
+        .join(Constant, Constant.id == Staff.gender_id)
+        .join(Season, Season.id == Staff.season_id)
+        .filter(Staff.id == staff_id))
+
+    data = db.execute(query)
+    parent = data.mappings().first()
+    return parent
 
 
 def get_staff_band(db, staff_id: int):

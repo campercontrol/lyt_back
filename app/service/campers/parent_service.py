@@ -164,6 +164,11 @@ def parent_camper_in_camp(camper_id:int, camp_id:int,  db: Session = Depends(get
     camper_payments_in_camp =  get_camper_payments_in_camp(db, camper_id, camp_id)
     payments = create_payment_table(db, camper_payments_in_camp)   
     
+    balance = 0
+    if len(payments) > 0:
+        balance = payments[-1]["balance"]
+    
+    
     # payments= get_payment_by_camper_camp(db, camper_id, camp_id)
     camper_in_camp = get_camper_in_camp_by_camper_camp(db, camper_id, camp_id)
 
@@ -173,7 +178,7 @@ def parent_camper_in_camp(camper_id:int, camp_id:int,  db: Session = Depends(get
         camper_subscribe = False
 
     if camp.show_payment_parent and camper_subscribe:
-        return{"camper_subscribe": camper_subscribe, "camp": camp, "location": location.name,  "payments":payments, "payment_balance": camper_in_camp.payment_balance}
+        return{"camper_subscribe": camper_subscribe, "camp": camp, "location": location.name,  "payments":payments, "payment_balance": balance}
     else:
         return{"camper_subscribe": camper_subscribe, "camp": camp, "location": location.name}
 

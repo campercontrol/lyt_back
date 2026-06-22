@@ -404,6 +404,11 @@ def get_payment_page_camper_in_camp(
     camper_payments_in_camp =  get_camper_payments_in_camp(db, camper_id, camp_id)
     payment_table = create_payment_table(db, camper_payments_in_camp)  
     
+        
+    balance = 0
+    if len(payment_table) > 0:
+        balance = payment_table[-1]["balance"]
+    
     
 
     camp_name = db.query(Camp.name).filter(Camp.id == camp_id).first()[0]
@@ -433,7 +438,7 @@ def get_payment_page_camper_in_camp(
         "camp_id": camp_id,
         "camper_in_camp_id": camper_in_camp_id,
         "parent_id": camper.parent_id,
-        "payment_balance": camper_in_camp.payment_balance,
+        "payment_balance": balance,
         "payment_table": payment_table,
     }
 

@@ -17,7 +17,7 @@ def get_db():
 
 
 @mercadopago_routes.get("/mercado_pago/create_payment_link/{camp_id}/{camper_id}/{customer_defined_amount}", tags=["mercadopago"])
-def create_preference(camp_id : int, camper_id: int, customer_defined_amount: int, db: Session = Depends(get_db)):
+def create_preference(camp_id : int, camper_id: int, customer_defined_amount: float, db: Session = Depends(get_db)):
     response = create_mercadopago_preference(db, camp_id, camper_id, customer_defined_amount)
     if response == None:
         raise HTTPException(status_code=500, detail={"status": 3, "msg": "Ocurrió un error al crear la preferencia"})

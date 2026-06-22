@@ -29,6 +29,7 @@ from schema.mercadopago.mercadopago_payment_schema import MercadopagoPaymentCrea
 from schema.mercadopago.mercadopago_merchant_order_schema import MercadopagoMerchantOrderCreate
 from schema.mercadopago.mercadopago_seller_credentials import MercadopagoSellerCredentials
 from schema.payments.payment_schema import PaymentCreate
+from decimal import Decimal, ROUND_DOWN
 # SDK de Mercado Pago
 import mercadopago
 # Agrega credenciales
@@ -352,12 +353,15 @@ def get_mercadopago_seller_credentials(db: Session, code: str, state: str):
 
     
 
-def create_mercadopago_preference(db: Session, camp_id: int, camper_id: int, customer_defined_amount: int):
+def create_mercadopago_preference(db: Session, camp_id: int, camper_id: int, customer_defined_amount: float):
     try:
         camp_info = get_camp_info(db, camp_id) 
         customer_info = get_customer_info(db, camper_id)
         user_payments = get_mercadopago_payments_by_customer_id(db, customer_info['user_id'])
         customer_last_purchase_date = get_customer_last_purchase_date(db, customer_info['user_id'])
+        
+        customer_defined_amount = Decimal(str(customer_defined_amount)).quantize(Decimal('0.00'), rounding=ROUND_DOWN)
+        customer_defined_amount = float(customer_defined_amount)
         # Set marketplace fee to 0 due to kincamp tax issue
         marketplace_fee = get_marketplace_fee(customer_defined_amount)
         # marketplace_fee = 0
