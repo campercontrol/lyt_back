@@ -29,6 +29,14 @@ from model.catalogs import (
 from model.campers import (
     School    
 )
+from model.groupings.grouping import Grouping
+from model.groupings.grouping_camp import GroupingCamp
+from model.groupings.grouping_type import GroupingType
+from model.catalogs.vaccine import Vaccine
+from model.catalogs.licensed_medicine import LicensedMedicine
+from model.catalogs.pathological_background import PathologicalBackground
+from model.catalogs.food_restriction import FoodRestriction
+
 from model.catalogs.currency import Currency
 from schema.camps.camp_schema import CampCreate, CampModify
 from schema.pagination.pagination_schema import Pagination, SortEnum
@@ -36,7 +44,7 @@ from crud.campers.camper_crud import get_pathological_background_by_camper, get_
 from crud.camps.camper_in_camp_crud import get_campers_for_module_count
 from crud.camps.staff_in_camp_crud import get_staff_volunteer_in_camp_count, get_staff_in_camp_count
 from crud.campers_catalogs.camper_food_restriction_crud import get_camper_food_restriction
-from crud.campers.camper_comment_crud import get_camper_comment_by_camper_for_admin, get_camper_comment_by_camper_for_parent, get_camper_comment_by_camper_for_school
+from crud.campers.camper_comment_crud import get_camper_comment_by_camper_for_admin, get_camper_comment_by_camper_for_parent, get_camper_comment_by_camper_for_school, get_all_camper_comments_by_camper_id
 from crud.staff_catalogs.staff_food_restriction_crud import get_all_staff_food_restriction_by_id
 from crud.staff_catalogs.staff_vaccine_crud import get_staff_all_vaccines_by_staff_id
 from crud.groupings.grouping_camp_crud import get_camper_groupings_by_camper_id_and_camp_id
@@ -55,9 +63,11 @@ TRANSACTION_TYPE_CAMP_PAYMENT_ID = int(os.getenv("TRANSACTION_TYPE_CAMP_PAYMENT_
 TRANSACTION_TYPE_CAMP_REFUND_ID = int(os.getenv("TRANSACTION_TYPE_CAMP_REFUND_ID"))
 TRANSACTION_TYPE_CAMP_DISCOUNT_UPFRONT_PAYMENT_ID = int(os.getenv("TRANSACTION_TYPE_CAMP_DISCOUNT_UPFRONT_PAYMENT_ID"))
 TRANSACTION_TYPE_CAMP_STORE_PAYMENT = int(os.getenv("TRANSACTION_TYPE_CAMP_STORE_PAYMENT"))
-
-
-
+ROLE_PARENT_ID=1
+ROLE_STAFF_ID=2
+ROLE_SCHOOL_ID=3
+ROLE_TEACHER_ID=4
+ROLE_DOCTOR_ID=5
 
 
 def get_camp_insr_report(db: Session, camp_id: int):
@@ -345,9 +355,63 @@ def get_camp_gnl_report(db: Session, camp_id: int):
     catalog_blood_type =  aliased(Constant)
     catalog_camp_enrollment = aliased(Constant)
 
+    general_report = {};
+
+    licensed_medicines_catalog_query = (
+        db.query(LicensedMedicine.id, LicensedMedicine.name)
+        .select_from(LicensedMedicine)
+    )
+    licensed_medicines_catalog = db.execute(licensed_medicines_catalog_query)
+    licensed_medicines_catalog = licensed_medicines_catalog.mappings().all()
+    
+    vaccines_catalog_query = (
+        db.query(Vaccine.id, Vaccine.name)
+        .select_from(Vaccine)
+    )
+    vaccines_catalog = db.execute(vaccines_catalog_query)
+    vaccines_catalog = vaccines_catalog.mappings().all()
+
+    
+
+    camp_groupings_query = (
+        db.query(
+            Grouping.id,
+            Grouping.name.label('grouping'),
+            GroupingCamp.maximum_capacity,      
+            GroupingType.name.label('type'),
+            GroupingType.id.label('grouping_type_id')
+        ).select_from(Grouping)
+        .join(GroupingCamp, GroupingCamp.grouping_id == Grouping.id)
+        .join(GroupingType, Grouping.grouping_type_id == GroupingType.id)
+        .filter(GroupingCamp.camp_id == camp_id)
+    )
+    camp_groupings = db.execute(camp_groupings_query)
+    camp_groupings = camp_groupings.mappings().all()
 
 
-    query = (db.query(Camper.id,
+    camp_questions_extra_questions_query = (
+        db.query(CampExtraQuestion.id,
+                 CampExtraQuestion.question,
+                 CampExtraQuestion.is_required
+                 )
+        .select_from(CampExtraQuestion)
+        .filter(CampExtraQuestion.camp_id == camp_id)        
+    )
+    camp_questions = db.execute(camp_questions_extra_questions_query)
+    camp_questions = camp_questions.mappings().all()
+
+    camps_extra_charges_query = (
+        db.query(CampExtraCharge.id,
+                 CampExtraCharge.name,
+                 CampExtraCharge.price,
+        ).select_from(CampExtraCharge)
+        .filter(CampExtraCharge.camp_id == camp_id))
+    
+    camp_extra_charges = db.execute(camps_extra_charges_query)
+    camp_extra_charges = camp_extra_charges.mappings().all()
+
+
+    campers_query = (db.query(Camper.id,
                       Camper.name,
                       Camper.lastname_father,
                       Camper.lastname_mother,
@@ -411,10 +475,10 @@ def get_camp_gnl_report(db: Session, camp_id: int):
              .join(User, Parent.user_id == User.id)
              .join(School, Camper.school_id== School.id)
              .filter(and_(CamperInCamp.camp_id == camp_id, CamperInCamp.status == CAMP_STATUS_ENROLLED_ID)))
-    campers = db.execute(query)
+    campers = db.execute(campers_query)
     campers = campers.mappings().all()
 
-    campers_report = []
+    campers_data = []
    
     for camper in campers:
         camper_dict = dict(camper)
@@ -423,11 +487,20 @@ def get_camp_gnl_report(db: Session, camp_id: int):
         camper_licensed_medicine = get_camper_licensed_medicine(db, camper.id)
         camper_vaccines = get_camper_vaccines(db, camper.id)
         camper_extra_charges = get_extra_charge_by_camper_camp(db, camper.id, camp_id)
-        camper_parent_comments = get_camper_comment_by_camper_for_parent(db, camper.id)
-        camper_school_comments = get_camper_comment_by_camper_for_school(db, camper.id)
-        camper_admin_comments = get_camper_comment_by_camper_for_admin(db, camper.id)
+        camper_comments = get_all_camper_comments_by_camper_id(db, camper.id)
         camper_groupings = get_camper_groupings_by_camper_id_and_camp_id(db, camper.id, camp_id)
         camper_extra_answers = get_extra_answer_by_camper_camp(db, camper.id, camp_id)
+        camper_parent_comments = [];
+        camper_staff_comments = [];
+        camper_school_comments = [];
+
+        for camper_comment in camper_comments:
+            if camper_comment["role_id"] == ROLE_PARENT_ID:
+                camper_parent_comments.append(camper_comment)
+            if camper_comment["role_id"] == ROLE_STAFF_ID:
+                camper_staff_comments.append(camper_comment)
+            if camper_comment["role_id"] == ROLE_SCHOOL_ID:
+                camper_school_comments.append(camper_comment)
         
         
         for pathological_background in camper_pathological_background:
@@ -442,18 +515,26 @@ def get_camp_gnl_report(db: Session, camp_id: int):
         for licensed_medicine in camper_licensed_medicine:
             camper_dict[licensed_medicine["name"]] = licensed_medicine["is_active"]
             
-        for extra_charge in camper_extra_charges:
-            extracharge_column_name = f"{extra_charge['name']} ${extra_charge['price']}"
-            camper_dict[extracharge_column_name] = extra_charge["is_selected"]
-        
         camper_dict["Comments (Parent)"] = camper_parent_comments
-        camper_dict["Comments (Staff)"] = camper_admin_comments
+        camper_dict["Comments (Staff)"] = camper_staff_comments
         camper_dict["Comments (School)"] = camper_school_comments
         camper_dict["Groupings"] = camper_groupings
         camper_dict["Camper extra questions"] = camper_extra_answers
-        campers_report.append(camper_dict)
+        camper_dict["Camper extra charges"] = camper_extra_charges
+        campers_data.append(camper_dict)
         
-    return campers_report
+    general_report["licensed_medicines_catalog"] = licensed_medicines_catalog
+    general_report["vaccines_catalog"] = vaccines_catalog
+    general_report["pathological_background_catalog"] = get_pathological_background_by_camper(db, None)
+    general_report["food_restriction_catalog"] = get_camper_food_restriction(db, None)
+    general_report["camp_groupings"] = camp_groupings
+    general_report["camp_questions"] = camp_questions
+    general_report["camp_extra_charges"] = camp_extra_charges
+    general_report["campers_data"] = campers_data    
+    
+        
+    return general_report
+
 
 def get_camp_food_report(db: Session, camp_id: int):
 

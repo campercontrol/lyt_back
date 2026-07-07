@@ -32,6 +32,26 @@ def get_all_camper_comment(db):
 def get_camper_comment_by_id(db, camper_comment_id: int):
     return db.query(CamperComment).filter_by(id=camper_comment_id).first()
 
+
+def get_all_camper_comments_by_camper_id(db, camper_id: int):
+    query = (db.query(
+                CamperComment.id,
+                CamperComment.comment,
+                CamperComment.is_public,
+                CamperComment.show_to,
+                CamperComment.camp_id,
+                CamperComment.camper_id,
+                CamperComment.user_id,
+                User.role_id
+                      
+                      )
+            .join(User, User.id == CamperComment.user_id)
+            .filter(CamperComment.camper_id == camper_id)
+    )
+    rows = db.execute(query)
+    rows = rows.mappings().all()
+    return rows
+
 def get_camper_comments_by_camper_id(db, camper_id: int, role_id: int):
     data = []
     comments = []
@@ -345,6 +365,7 @@ def get_camper_comment_by_camper_for_admin(db, camper_id: int):
                 CamperComment.camper_id == camper_id,
                 CamperComment.is_public == True,
                 CamperComment.show_to == ROLE_STAFF_ID,
+                   
             )
         )
         .all()
