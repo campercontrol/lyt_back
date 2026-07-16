@@ -94,7 +94,7 @@ from schema.campers_catalogs.camper_pathological_background_fm_schema import (
 
 from schema.campers.camper_schema import CamperCreate, CamperModify, CamperComplete
 from utils.db import SessionLocal
-
+from utils.payments.payment_table import get_camper_total_balance, get_camper_balance_per_camp
 # from utils.image_tools import rewrite_image
 
 from utils.db import db_mapping_rows_to_dict
@@ -384,19 +384,29 @@ def get_camper_profile(camper_id: int, db: Session = Depends(get_db)):
     camper_passed_camps = get_past_subscribe_by_camper(db, camper_id)
     siblings = get_parent_campers_by_parent_id(db, parent.id) 
     filtered_siblings = [sibling for sibling in siblings if sibling.id != camper_id]
-    
-    
-    total_amount = 0
-    
-    for camp in camper_subscribe_camps:
-        total_amount = total_amount + camp.get('camper_payment_balance')
 
-    for camp in camper_passed_camps:
-        total_amount = total_amount + camp.get('camper_payment_balance') 
+
+    camper_total_balance = get_camper_total_balance(db, camper_id)
+    
+    for index, camper_passed_camp in enumerate(camper_passed_camps):
+        camper_passed_camp_dict = dict(camper_passed_camp)
+        camper_passed_camp_dict["camper_payment_balance"] = get_camper_balance_per_camp(db, camper_id, camper_passed_camp["camp_id"])
+        camper_passed_camps[index] = camper_passed_camp_dict
+    
+    for index, camper_subscribe_camp in enumerate(camper_subscribe_camps):
+        camper_subscribe_camps_dict = dict(camper_subscribe_camp)
+        camper_subscribe_camps_dict["camper_payment_balance"] = get_camper_balance_per_camp(db, camper_id, camper_subscribe_camp["camp_id"])
+        camper_subscribe_camps[index] = camper_subscribe_camps_dict
+    
+    for index, camper_cancelled_camp in enumerate(camper_cancelled_camps):
+        camper_cancelled_camps_dict = dict(camper_cancelled_camp)
+        camper_cancelled_camps_dict["camper_payment_balance"] = get_camper_balance_per_camp(db, camper_id, camper_cancelled_camp["camp_id"])
+        camper_cancelled_camps[index] = camper_cancelled_camps_dict
+
     data = {
         "camper_band": camper_band,
         "camper_info": camper_info,
-        "camper_total_amount": total_amount,
+        "camper_total_amount": camper_total_balance,
         "parent": parent,
         "siblings": filtered_siblings,
         "user_email": user[0].email,

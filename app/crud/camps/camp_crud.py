@@ -51,7 +51,7 @@ from crud.groupings.grouping_camp_crud import get_camper_groupings_by_camper_id_
 from crud.payments.payment_crud import delete_payment_and_update_balance_transaction, create_new_payment_and_update_balance_transaction
 from helper.pagination_helpers import pagination_params, get_number_of_pages
 from crud.campers.camper_extra_answer_crud import get_extra_answer_by_camper_camp
-
+from utils.payments.payment_table import get_camper_balance_per_camp
 
 BACKEND_DEV_URL = os.getenv("BACKEND_DEV_URL")
 PAYPAL_LINK_URL = os.getenv("PAYPAL_LINK_URL")
@@ -147,9 +147,9 @@ def get_camp_incomes(db: Session, camp_id: int):
     
     campers_in_camp = db.query(CamperInCamp.id, CamperInCamp.payment_balance, CamperInCamp.camp_id, CamperInCamp.camper_id, Constant.value).select_from(CamperInCamp).join(Constant, Constant.id == CamperInCamp.status).filter(CamperInCamp.camp_id == camp_id).all()
     if campers_in_camp:
-
         campers_and_payments_info = []
         for camper in campers_in_camp:
+            camper_balance_per_camp = get_camper_balance_per_camp(db, camper.camper_id, camp_id)
             camper_payments_by_method = []
             camper_payments_info = {}
             payment_info = {}
@@ -192,7 +192,7 @@ def get_camp_incomes(db: Session, camp_id: int):
                 "number_of_refunds": camper_total_refund_transactions or 0
             }
             camp_status = {
-                "balance": format_numbers_commas_currency(camper.payment_balance or 0, camp_info.symbol, camp_info.acronyms),
+                "balance": format_numbers_commas_currency(camper_balance_per_camp or 0, camp_info.symbol, camp_info.acronyms),
                 "enrolment_status": camper.value
             }
             

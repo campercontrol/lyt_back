@@ -39,8 +39,10 @@ from crud.campers.camper_crud import get_camper_by_uuid
 from crud.campers.camper_extra_answer_crud import get_extra_answer_by_camper_camp
 from crud.camps.camp_extra_question_crud import get_extra_question_by_camp
 from crud.mailings.mailing_crud import get_admin_users_for_mailing, get_camper_info_mailing, get_camp_info_by_id_mailing
+from crud.payments.payment_crud import get_camper_payments_in_camp
 from helper.camper_helpers import update_record_campers
 from helper.mailing_helpers import send_mail_template
+from utils.payments.payment_table import get_payment_table, create_payment_table_unformatted
 
 from crud.payments.payment_crud import get_payment_transaction_type_by_movement, create_new_payment_and_update_balance, create_new_payment, create_new_payment_transaction, delete_payment_and_update_balance
 
@@ -394,6 +396,12 @@ def get_campers_for_camp(db: Session, camp_id: int):
     campers_complete = []
      
     for camper in db_mapping_rows_to_dict(campers):
+        camper_payments_in_camp =  get_camper_payments_in_camp(db, camper.camper_id, camp_id)
+        payment_table = create_payment_table_unformatted(db, camper_payments_in_camp)  
+         
+        balance = 0
+        if len(payment_table) > 0:
+            balance = payment_table[-1]["balance"]
         
         comments = get_camper_comment_by_camper_for_admin(db, camper.camper_id)
         
@@ -411,7 +419,7 @@ def get_campers_for_camp(db: Session, camp_id: int):
                 "camper_attend": camper.camper_attend,
                 "camper_attended": camper.camper_attended,
                 "camper_total": camper.camper_total,
-                "camper_total_balance": camper.camper_total_balance,
+                "camper_total_balance": balance,
                 "camper_birthday": camper.camper_birthday,
                 "tutor_full_name": camper.tutor_full_name,
                 "tutor_email": camper.tutor_email,

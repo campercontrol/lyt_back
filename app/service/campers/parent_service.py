@@ -49,7 +49,7 @@ from schema.campers.parent_schema import(
 from crud.crud_user import create_new_user, get_user_by_email, create_parent_complete
 from utils.db import SessionLocal
 from utils.image_tools import img_to_base_64
-from utils.payments.payment_table import create_payment_table
+from utils.payments.payment_table import create_payment_table, get_camper_balance_per_camp, get_camper_total_balance
 from utils.pdf.baucher_pago import generar_pdf_baucher
 from utils.formatters import format_numbers_commas_currency
 from model.catalogs.payment_account import PaymentAccount
@@ -133,25 +133,45 @@ def parent_dashboard(parent_id:int, db: Session = Depends(get_db)):
     parent_total_amount = 0
     list_campers= get_campers_from_parent(db, parent_id)
     for camper in list_campers:
-        total_amount = 0
         camps_info = get_camps_name_amount_camper(db, camper.get('id'))
-        for camp in camps_info:
-            total_amount = total_amount + camp.get('camper_payment_balance')
+        
+        total_balance = get_camper_total_balance(db, camper.get('id'))
+
         past_camps = get_past_subscribe_by_camper(db, camper.get('id'))
         
-        due_past_camps = get_past_due_camps_by_camper(db, camper.get('id'))
+        for index, camp_info in enumerate(camps_info):
+            camp_info_dict = dict(camp_info)
+            balance = get_camper_balance_per_camp(db, camper.get('id'), camp_info.get('camp_id'))
+            camp_info_dict["camper_payment_balance"] = balance
+            camps_info[index] = camp_info_dict
         
-        for camp in past_camps:
-            total_amount = total_amount + camp.get('camper_payment_balance') 
+        
+        for index, past_camp in enumerate(past_camps):
+            past_camp_dict = dict(past_camp)
+            balance = get_camper_balance_per_camp(db, camper.get('id'), past_camp.get('camp_id'))
+            past_camp_dict["camper_payment_balance"] = balance
+            past_camps[index] = past_camp_dict
+ 
+       
+        due_past_camps = get_past_due_camps_by_camper(db, camper.get('id'))
+
+        for index, due_past_camp in enumerate(due_past_camps):
+            due_past_camp_dict = dict(due_past_camp)
+            balance = get_camper_balance_per_camp(db, camper.get('id'), due_past_camp.get('camp_id'))
+            due_past_camp_dict["camper_payment_balance"] = balance
+            due_past_camps[index] = due_past_camp_dict
+
+
+
         info.append(
             {
                 "camper": camper,
-                "camper_balance": total_amount,
+                "camper_balance": total_balance,
                 "camps": camps_info,
                 "due_past_camps": due_past_camps
             }
         )
-        parent_total_amount = parent_total_amount + total_amount
+        parent_total_amount = total_balance
     return{
             "parent_total_amount": parent_total_amount,
             "campers": info            
