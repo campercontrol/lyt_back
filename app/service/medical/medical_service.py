@@ -96,7 +96,7 @@ def get_medical_camp_camper(
     camp_id: int, camper_id: int, db: Session = Depends(get_db)
 ):
     camper_visits = camper_visit_for_camp(db, camper_id, camp_id)
-    camper_info = (camper_id, "es", db)
+    camper_info = get_camper_by_id_complete(camper_id, "es", db)
     camper = camper_info["camper"]
     camper_parent = get_parent_by_camper_id(db, camper.id)
     parent_info = get_parent_by_uuid(db, camper_parent["id"])

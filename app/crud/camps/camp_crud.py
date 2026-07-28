@@ -35,6 +35,7 @@ from model.groupings.grouping_type import GroupingType
 from model.catalogs.vaccine import Vaccine
 from model.catalogs.licensed_medicine import LicensedMedicine
 from model.catalogs.pathological_background import PathologicalBackground
+from model.catalogs.pathological_background_family import PathologicalBackgroundFamily
 from model.catalogs.food_restriction import FoodRestriction
 
 from model.catalogs.currency import Currency
@@ -371,7 +372,28 @@ def get_camp_gnl_report(db: Session, camp_id: int):
     vaccines_catalog = db.execute(vaccines_catalog_query)
     vaccines_catalog = vaccines_catalog.mappings().all()
 
+    food_restriction_catalog_query = (
+        db.query(FoodRestriction.id, FoodRestriction.name)
+        .select_from(FoodRestriction)
+    )
+    food_restriction_catalog = db.execute(food_restriction_catalog_query)
+    food_restriction_catalog = food_restriction_catalog.mappings().all()
+
+    pathological_background_catalog_query = (
+        db.query(PathologicalBackground.id, PathologicalBackground.name)
+        .select_from(PathologicalBackground)
+    )
+    pathological_background_catalog = db.execute(pathological_background_catalog_query)
+    pathological_background_catalog = pathological_background_catalog.mappings().all()
     
+    pathological_background_family_catalog_query = (
+        db.query(PathologicalBackgroundFamily.id, PathologicalBackgroundFamily.name)
+        .select_from(PathologicalBackgroundFamily)
+    )
+    pathological_background_family_catalog = db.execute(pathological_background_family_catalog_query)
+    pathological_background_family_catalog = pathological_background_family_catalog.mappings().all()
+
+
 
     camp_groupings_query = (
         db.query(
@@ -412,57 +434,57 @@ def get_camp_gnl_report(db: Session, camp_id: int):
 
 
     campers_query = (db.query(Camper.id,
-                      Camper.name,
-                      Camper.lastname_father,
-                      Camper.lastname_mother,
-                      catalog_gender.value.label('gender'),
-                      Camper.birthday,
-                      func.concat(extract('year', func.age(func.current_date(), Camper.birthday)), " años ",  extract('month', func.age(func.current_date(), Camper.birthday)), " meses ").label("Age"),
-                      Camper.height,
-                      Camper.weight,
-                      catalog_grade.value.label('grade'),
-                      School.name.label("school"),
-                      Camper.school_other,
-                      Camper.email.label('camper_email'),
-                      catalog_swim.value.label('swim'),
-                      Camper.affliction,
-                      catalog_blood_type.value.label('blood_type'),
-                      Camper.heart_problems,
-                      Camper.psicology_treatments,
-                      Camper.prevent_activities,
-                      Camper.drug_allergies,
-                      Camper.other_allergies,
-                      Camper.nocturnal_disorders,
-                      Camper.phobias,
-                      Camper.drugs,
-                      Camper.doctor_precall,
-                      Camper.prohibited_foods,
-                      Camper.comments_admin,
-                      Camper.insurance,
-                      Camper.insurance_company,
-                      Camper.insurance_number,
-                      Camper.security_social_number,
-                      Parent.tutor_name,
-                      Parent.tutor_lastname_father,
-                      Parent.tutor_lastname_mother,
-                      Parent.tutor_cellphone,
-                      Parent.tutor_home_phone,
-                      Parent.tutor_work_phone,
-                      User.email.label("tutor_email"),
-                      Parent.contact_name.label("second_tutor_name"),
-                      Parent.contact_lastname_father.label("second_tutor_father_lastname"),
-                      Parent.contact_lastname_mother.label("second_tutor_mother_lastname"),
-                      Parent.contact_cellphone.label("second_tutor_cellphone"),
-                      Parent.contact_home_phone.label("second_tutor_home_phone"),
-                      Parent.contact_work_phone.label("second_tutor_work_phone"),
-                      Parent.contact_email.label("second_tutor_email"),
-                      Camper.contact_name.label("emergency_contact"),
-                      Camper.contact_relation.label("contact_kinship"),
-                      Camper.contact_cellphone,
-                      Camper.contact_homephone,
-                      CamperInCamp.payment_balance,
-                      Camper.created_at.label("registration_date"),
-                      catalog_camp_enrollment.value.label("enrollment")
+                      Camper.name.label('Nombre'),
+                      Camper.lastname_father.label('Apellido Paterno'),
+                      Camper.lastname_mother.label('Apellido Materno'),
+                      catalog_gender.value.label('Género'),
+                      Camper.birthday.label('Fecha de Nacimiento'),
+                      func.concat(extract('year', func.age(func.current_date(), Camper.birthday)), " años ",  extract('month', func.age(func.current_date(), Camper.birthday)), " meses ").label("Edad"),
+                      Camper.height.label('Altura'),
+                      Camper.weight.label('Peso'),
+                      catalog_grade.value.label('Grado'),
+                      School.name.label("Escuela"),
+                      Camper.school_other.label("Otra Escuela"),
+                      Camper.email.label('email del camper'),
+                      catalog_swim.value.label('¿Sabe Nadar?'),
+                      Camper.affliction.label('Afección'),
+                      catalog_blood_type.value.label('Tipo de Sangre'),
+                      Camper.heart_problems.label('Problemas Cardíacos'),
+                      Camper.psicology_treatments.label('Tratamientos Psicológicos'),
+                      Camper.prevent_activities.label('Actividades Preventivas'),
+                      Camper.drug_allergies.label('Alergias a Medicamentos'),
+                      Camper.other_allergies.label('Otras Alergias'),
+                      Camper.nocturnal_disorders.label('Trastornos Nocturnos'),
+                      Camper.phobias.label('Fobias'),
+                      Camper.drugs.label('Medicamentos'),
+                      Camper.doctor_precall.label('Llamada al Doctor'),
+                      Camper.prohibited_foods.label('Alimentos Prohibidos'),
+                      Camper.comments_admin.label('Comentarios Administrativos'),
+                      Camper.insurance.label('seguro'),
+                      Camper.insurance_company.label('Compañía de Seguro'),
+                      Camper.insurance_number.label('Número de Seguro'),
+                      Camper.security_social_number.label('Número de Seguridad Social'),
+                      Parent.tutor_name.label('Nombre del Tutor'),
+                      Parent.tutor_lastname_father.label('Apellido Paterno del Tutor'),
+                      Parent.tutor_lastname_mother.label('Apellido Materno del Tutor'),
+                      Parent.tutor_cellphone.label('Celular del Tutor'),
+                      Parent.tutor_home_phone.label('Teléfono de Casa del Tutor'),
+                      Parent.tutor_work_phone.label('Teléfono del Trabajo del Tutor'),
+                      User.email.label('Email del Tutor'),
+                      Parent.contact_name.label('Nombre del Segundo Tutor'),
+                      Parent.contact_lastname_father.label("Apellido Paterno del Segundo Tutor"),
+                      Parent.contact_lastname_mother.label("Apellido Materno del Segundo Tutor"),
+                      Parent.contact_cellphone.label('Celular del Segundo Tutor'),
+                      Parent.contact_home_phone.label("Teléfono de Casa del Segundo Tutor"),
+                      Parent.contact_work_phone.label("Teléfono del Trabajo del Segundo Tutor"),
+                      Parent.contact_email.label("Email del Segundo Tutor"),
+                      Camper.contact_name.label("Nombre del Contacto de Emergencia"),
+                      Camper.contact_relation.label("Parentesco del Contacto de Emergencia"),
+                      Camper.contact_cellphone.label("Celular del Contacto de Emergencia"),
+                      Camper.contact_homephone.label("Teléfono de Casa del Contacto de Emergencia"),
+                      CamperInCamp.payment_balance.label("Saldo de Pago"),
+                      Camper.created_at.label("Fecha de Registro"),
+                      catalog_camp_enrollment.value.label("Estatus de inscripción")
                       ).select_from(CamperInCamp)
              .join(Camp, CamperInCamp.camp_id == Camp.id)
              .join(Camper, CamperInCamp.camper_id == Camper.id)
@@ -515,18 +537,19 @@ def get_camp_gnl_report(db: Session, camp_id: int):
         for licensed_medicine in camper_licensed_medicine:
             camper_dict[licensed_medicine["name"]] = licensed_medicine["is_active"]
             
-        camper_dict["Comments (Parent)"] = camper_parent_comments
-        camper_dict["Comments (Staff)"] = camper_staff_comments
-        camper_dict["Comments (School)"] = camper_school_comments
-        camper_dict["Groupings"] = camper_groupings
-        camper_dict["Camper extra questions"] = camper_extra_answers
-        camper_dict["Camper extra charges"] = camper_extra_charges
+        camper_dict["Comentarios de Padres"] = camper_parent_comments
+        camper_dict["Comentarios del Personal"] = camper_staff_comments
+        camper_dict["Comentarios de la Escuela"] = camper_school_comments
+        camper_dict["Agrupaciones"] = camper_groupings
+        camper_dict["Preguntas Extra del Camper"] = camper_extra_answers
+        camper_dict["Cargos Extra del Camper"] = camper_extra_charges
         campers_data.append(camper_dict)
         
     general_report["licensed_medicines_catalog"] = licensed_medicines_catalog
     general_report["vaccines_catalog"] = vaccines_catalog
-    general_report["pathological_background_catalog"] = get_pathological_background_by_camper(db, None)
-    general_report["food_restriction_catalog"] = get_camper_food_restriction(db, None)
+    general_report["pathological_background_catalog"] = pathological_background_catalog
+    general_report["pathological_background_family_catalog"] = pathological_background_family_catalog
+    general_report["food_restriction_catalog"] = food_restriction_catalog
     general_report["camp_groupings"] = camp_groupings
     general_report["camp_questions"] = camp_questions
     general_report["camp_extra_charges"] = camp_extra_charges
