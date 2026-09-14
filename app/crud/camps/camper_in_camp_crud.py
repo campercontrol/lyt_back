@@ -52,7 +52,7 @@ TRANSACTION_TYPE_CAMP_PRICE_ID = int(os.getenv("TRANSACTION_TYPE_CAMP_PRICE_ID")
 TRANSACTION_TYPE_CAMP_ADDITIONAL_SERVICE_ID = int(os.getenv("TRANSACTION_TYPE_CAMP_ADDITIONAL_SERVICE_ID"))
 CAMP_REGISTRATION_PARENT_TEMPLATE_ID = int(os.getenv("CAMP_REGISTRATION_PARENT_TEMPLATE_ID"))
 CAMP_REGISTRATION_STAFF_TEMPLATE_ID = int(os.getenv("CAMP_REGISTRATION_STAFF_TEMPLATE_ID"))
-
+CAMP_STATUS_ENROLLED_ID = int(os.getenv("CAMP_STATUS_ENROLLED_ID"))
 
 def get_all_camper_in_camp(db: Session):
     rows = db.query(CamperInCamp).all()
@@ -926,7 +926,7 @@ def get_campers_in_camp_and_groupings(db, camp_id: int):
         .join(CamperInCamp, CamperInCamp.camper_id == Camper.id)
         .join(catalog_one, Camper.gender_id == catalog_one.id)
         .join(catalog_two, Camper.grade == catalog_two.id)
-        .where(CamperInCamp.camp_id == camp_id)
+        .where(and_(CamperInCamp.camp_id == camp_id, CamperInCamp.status == CAMP_STATUS_ENROLLED_ID))
 
     )
     campers = db.execute(campers_query)
