@@ -52,6 +52,16 @@ def get_all_camper_comments_by_camper_id(db, camper_id: int):
     rows = rows.mappings().all()
     return rows
 
+
+def get_camper_comments_count(db, camper_id: int):
+    comments_count = (
+        db.query(func.count(CamperComment.id))
+        .filter(CamperComment.camper_id == camper_id)
+        .scalar()
+    )
+    return comments_count
+
+
 def get_camper_comments_by_camper_id(db, camper_id: int, role_id: int):
     data = []
     comments = []
