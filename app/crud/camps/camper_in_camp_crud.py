@@ -32,7 +32,7 @@ from schema.payments.payment_schema import PaymentCreate
 
 from crud.campers.camper_extra_answer_crud import create_new_extra_answer, get_extra_answer_by_uuid, create_new_extra_answer_transaction
 from crud.payments.camper_extra_charge_crud import create_new_camper_extra_charge, get_camper_extra_charge_by_id, create_new_camper_extra_charge_transaction, create_new_payment_and_update_balance_transaction
-from crud.campers.camper_comment_crud import get_camper_comment_by_camper_for_admin
+from crud.campers.camper_comment_crud import get_camper_comment_by_camper_for_admin, get_camper_comments_count
 from crud.camps.camp_extra_charge_crud import get_extra_charge_by_id, get_extra_charge_by_camp
 from crud.campers.parent_crud import get_parent_by_camper_id, get_second_tutor_by_camper_id
 from crud.campers.camper_crud import get_camper_by_uuid
@@ -403,7 +403,7 @@ def get_campers_for_camp(db: Session, camp_id: int):
         if len(payment_table) > 0:
             balance = payment_table[-1]["balance"]
         
-        comments = get_camper_comment_by_camper_for_admin(db, camper.camper_id)
+        comments_count = get_camper_comments_count(db, camper.camper_id)
         
         
         campers_complete.append(
@@ -414,7 +414,7 @@ def get_campers_for_camp(db: Session, camp_id: int):
                 "camper_id": camper.camper_id,
                 "camper_photo": camper.camper_photo,
                 "camper_full_name": camper.camper_full_name,
-                "camper_comments": len(comments),
+                "camper_comments": comments_count,
                 "camper_doctor_precall": camper.camper_doctor_precall,
                 "camper_attend": camper.camper_attend,
                 "camper_attended": camper.camper_attended,
