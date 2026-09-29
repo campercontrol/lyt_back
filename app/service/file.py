@@ -12,6 +12,8 @@ from model.user import User
 # from utils.check_role import chek_permission
 from utils.db import SessionLocal
 from utils.image_tools import write_image,open_image
+from utils.file.file import upload_file
+from schema.file import uploadFile
 
 files_routes = APIRouter()
 
@@ -36,3 +38,13 @@ async def upload_cv_staff(
     finally:
         file.file.close()
     return path
+
+
+@files_routes.post("/upload_file", tags=["Files"])
+def upload_single_file(
+    file: UploadFile,
+    path: str,
+    db: Session = Depends(get_db)
+):
+    image_route = upload_file(file, path)
+    return {"path": image_route}
