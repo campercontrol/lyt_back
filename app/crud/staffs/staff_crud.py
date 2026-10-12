@@ -643,3 +643,81 @@ def get_prospects_general_report(db: Session):
         staffs_report.append(staff_dict)
        
     return staffs_report
+
+def get_all_staff_report(db: Session):
+    query = (db.query(Staff.id,
+                      Staff.name.label("Nombre"),
+                      Staff.lastname_father.label("Apellido Paterno"),
+                      Staff.lastname_mother.label("Apellido Materno"),
+                      Constant.value.label("Género"),
+                      User.email.label("email"),
+                      Staff.curp,
+                      Staff.rfc,
+                      Staff.cellphone.label("Teléfono Celular"),
+                      Staff.home_phone.label("Teléfono de Casa"),
+                      Staff.birthday.label("Fecha de Nacimiento"),
+                      Staff.affliction.label("Afecciones"),
+                      Staff.blood_type.label("Tipo de Sangre"),
+                      Staff.drug_allergies.label("Alergias a Medicamentos"),
+                      Staff.other_allergies.label("Otras Alergias"),
+                      Staff.nocturnal_disorders.label("Trastornos Nocturnos"),
+                      Staff.phobias.label("Fobias"),
+                      Staff.drugs.label("Medicamentos"),
+                      Staff.prohibited_foods.label("Alimentos Prohibidos"),
+                      Staff.bio.label("Biografía"),
+                      Staff.cv,
+                      Staff.comments.label("Comentarios"),
+                      Staff.employee.label("¿Es Empleado?"),
+                      Staff.coordinator.label("¿Es Coordinador?"),
+                      Staff.facebook.label("Facebook"),
+                      Staff.staff_contact_name.label("Nombre de Contacto"),
+                      Staff.staff_contact_relation.label("Relación de Contacto"),
+                      Staff.staff_contact_homephone.label("Teléfono de Contacto"),
+                      Staff.staff_contact_cellphone.label("Celular de Contacto"),
+                      ).select_from(Staff)
+             .join(Constant, Constant.id == Staff.gender_id)
+             .join(User, Staff.login_id == User.id)
+            )
+    staffs = db.execute(query).mappings().all()
+    staffs_info = [dict(staff) for staff in staffs]
+    staff_ids = [staff["id"] for staff in staffs_info]
+
+    if not staff_ids:
+        return staffs_info
+
+    staffs_by_id = {staff["id"]: staff for staff in staffs_info}
+    print(staffs_by_id)
+    food_restrictions = (
+        db.query(
+            StaffFoodRestriction.staff_id,
+            FoodRestriction.name,
+            StaffFoodRestriction.is_active,
+        )
+        .select_from(StaffFoodRestriction)
+        .join(
+            FoodRestriction,
+            StaffFoodRestriction.food_restriction_id == FoodRestriction.id,
+        )
+        .filter(StaffFoodRestriction.staff_id.in_(staff_ids))
+        .all()
+    )
+    for food_restriction in food_restrictions:
+        staffs_by_id[food_restriction.staff_id][food_restriction.name] = (
+            food_restriction.is_active
+        )
+
+    vaccines = (
+        db.query(
+            StaffVaccine.staff_id,
+            Vaccine.name,
+            StaffVaccine.is_active,
+        )
+        .select_from(StaffVaccine)
+        .join(Vaccine, StaffVaccine.vaccine_id == Vaccine.id)
+        .filter(StaffVaccine.staff_id.in_(staff_ids))
+        .all()
+    )
+    for vaccine in vaccines:
+        staffs_by_id[vaccine.staff_id][vaccine.name] = vaccine.is_active
+
+    return staffs_info

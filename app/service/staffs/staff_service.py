@@ -19,7 +19,8 @@ from crud.staffs.staff_crud import (
     get_staff_band,
     get_staff_food_restriction,
     get_staff_vaccines,
-    get_prospects_general_report
+    get_prospects_general_report,
+    get_all_staff_report
 )
 
 from crud.catalogs.constant_crud import (
@@ -282,5 +283,10 @@ def staff_record_status(db: Session = Depends(get_db)):
 @staff_routes.post("/prospects/report/general", tags=["Staff"])
 def prospects_general_report(db: Session = Depends(get_db)):
     report = get_prospects_general_report(db)
+    return report
+    
+@staff_routes.get("/staff/report/general", tags=["Staff"])
+def staff_general_report(db: Session = Depends(get_db)):
+    report = get_all_staff_report(db)
     return report
     
