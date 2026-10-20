@@ -16,7 +16,6 @@ from crud.crud_user import (
     get_user_by_email,
     crud_update_user_by_email,
     search_user_by_email,
-    update_password_all_users,
     update_user_by_id,
     delete_user_by_id,
     get_user_info_by_email,
@@ -491,11 +490,6 @@ def get_search_user(search:str, db: Session = Depends(get_db)):
     possible_users  = search_user_by_email(db, search)
     return { "data": possible_users }
 
-
-@user_routes.post("/update/all/password/", tags=["Usuarios"])
-def update_all_users_pass(hash_pass:str, db: Session = Depends(get_db)):
-    result = update_password_all_users(db, hash_pass)
-    return {"data": result}
 
 @user_routes.delete("/delete_usuario/{user_id}", tags=["Usuarios"])
 def delete_user(user_id:str, db: Session = Depends(get_db)):

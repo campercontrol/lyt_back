@@ -56,8 +56,6 @@ from service.image import image_routes
 from service.permission import permission_routes
 from service.generar_pdf import pdf_routes
 from service.email import email_routes
-from service.toku_payment import toku_routes
-from service.migrar import migrar_routes 
 from service.groupings.grouping_service import grouping_router
 from service.groupings.grouping_type_service import grouping_type_router
 from service.groupings.grouping_camp_service import grouping_camp_router
@@ -155,9 +153,7 @@ app.include_router(user_routes) # User
 app.include_router(image_routes) # Image
 app.include_router(permission_routes) # Permission
 app.include_router(pdf_routes) #Pdf
-app.include_router(toku_routes)
 app.include_router(mercadopago_routes)
-app.include_router(migrar_routes)
 app.include_router(grouping_router)
 app.include_router(grouping_type_router)
 app.include_router(grouping_camp_router)
