@@ -76,6 +76,8 @@ from schema.pagination.pagination_schema import Pagination
 from helper.pagination_helpers import pagination_params
 
 staff_routes = APIRouter()
+# Endpoints sin autenticacion (registro de prospectos)
+staff_public_routes = APIRouter()
 
 
 def get_db():
@@ -109,7 +111,7 @@ def get_staff(pagination: Annotated[Pagination, Depends(pagination_params)], db:
     return {"data": list_staff}
 
 
-@staff_routes.post("/prospect/", tags=["Prospect"])
+@staff_public_routes.post("/prospect/", tags=["Prospect"])
 def create_prospect(
     new_prospect: ProspectCompleteCreate, db: Session = Depends(get_db)
 ):

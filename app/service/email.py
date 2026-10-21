@@ -26,6 +26,8 @@ import pytz
 newMexZone = pytz.timezone("America/Mexico_City") 
 
 email_routes = APIRouter()
+# Endpoints sin autenticacion (webhooks del proveedor de correo)
+email_public_routes = APIRouter()
 
 
 #Envio de mensajes --------------------------------->
@@ -254,7 +256,7 @@ def delete_registry_webhook(webhook_type:str,response: Response):
 #Webhook para los estados de los correos  --------------------------------->
 
 
-@email_routes.post("/email/accepted_webhook", tags=["Email"])
+@email_public_routes.post("/email/accepted_webhook", tags=["Email"])
 async def listen_accepted_webhook(request: Request):
     NAME = "listen_accepted_webhook"
     datos = await request.body()
@@ -314,7 +316,7 @@ async def listen_accepted_webhook(request: Request):
     return []
 
 
-@email_routes.post("/email/clicks_webhook", tags=["Email"])
+@email_public_routes.post("/email/clicks_webhook", tags=["Email"])
 async def listen_clicks_webhook(request: Request):
     """
     Note When adding a Clicked or Opened webhook, ensure that you also have tracking enabled.
@@ -376,7 +378,7 @@ async def listen_clicks_webhook(request: Request):
     return []
 
 
-@email_routes.post("/email/delivered_message_webhook", tags=["Email"])
+@email_public_routes.post("/email/delivered_message_webhook", tags=["Email"])
 async def listen_delivered_message_webhook(request: Request):
     NAME = "listen_delivered_message_webhook"
     datos = await request.body()
@@ -451,7 +453,7 @@ async def listen_delivered_message_webhook(request: Request):
     return []
 
 
-@email_routes.post("/email/opens_message_webhook", tags=["Email"])
+@email_public_routes.post("/email/opens_message_webhook", tags=["Email"])
 async def listen_opens_message_webhook(request: Request):
     """
     Note When adding a Clicked or Opened webhook, ensure that you also have tracking enabled.

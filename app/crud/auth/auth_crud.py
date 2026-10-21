@@ -62,15 +62,21 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    db = SessionLocal()
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        # Los tokens de /refresh/token solo incluyen "user_email"
+        username: str = payload.get("sub") or payload.get("user_email")
         if username is None:
             raise credentials_exception
+    except ExpiredSignatureError as ex:
+        raise HTTPException(status_code=403, detail=str(ex))
     except JWTError:
         raise credentials_exception
-    user = get_user(db, username)
+    db = SessionLocal()
+    try:
+        user = get_user(db, username)
+    finally:
+        db.close()
     if user is None:
         raise credentials_exception
     return user

@@ -14,8 +14,8 @@ from service.catalogs.constant_service import constant_routes
 from service.catalogs.payment_account_service  import payment_account_routes
 from service.catalogs.staff_role_service import staff_role_routes
 from service.campers.school_service import school_routes
-from service.campers.parent_service import parent_routes
-from service.campers.camper_service import camper_routes
+from service.campers.parent_service import parent_routes, parent_public_routes
+from service.campers.camper_service import camper_routes, camper_public_routes
 from service.camps.location_service import location_routes
 from service.camps.season_service import season_routes
 from service.camps.camp_service import camp_router
@@ -29,7 +29,7 @@ from service.payments.payment_service import payment_routes
 from service.payments.payment_method_service import payment_method_routes
 from service.payments.payment_transaction_type_service import payment_transaction_type_routes
 from service.payments.camper_extra_charge_service import camper_extra_charge_routes
-from service.staffs.staff_service import staff_routes
+from service.staffs.staff_service import staff_routes, staff_public_routes
 from service.camps.staff_in_camp_service import staff_in_camp_routes
 from service.training.training_service import training_router
 from service.training.training_event_service import training_event_router
@@ -46,16 +46,16 @@ from service.trophies.trophy_service import trophy_routes
 from service.trophies.trophy_season_service import trophy_season_routes
 from service.trophies.trophy_staff_service import trophy_staff_routes
 from service.medical.medical_service import medical_routes
-from service.mercadopago.mercado_pago_service import mercadopago_routes
+from service.mercadopago.mercado_pago_service import mercadopago_routes, mercadopago_public_routes
 from service.role import role_routes
-from service.user import user_routes
+from service.user import user_routes, user_public_routes
 # from service.token import token_routes
 # Temporal Token Fix, please uncomment this code in the next iteration
 from service.auth.auth_service import token_routes
 from service.image import image_routes
 from service.permission import permission_routes
 from service.generar_pdf import pdf_routes
-from service.email import email_routes
+from service.email import email_routes, email_public_routes
 from service.groupings.grouping_service import grouping_router
 from service.groupings.grouping_type_service import grouping_type_router
 from service.groupings.grouping_camp_service import grouping_camp_router
@@ -105,61 +105,70 @@ app.add_middleware(
 )
 
 
+# Routers protegidos: requieren header "Authorization: Bearer <token>"
 app.include_router(prueba_routes, dependencies=auth_user)  # Login
-app.include_router(currency_routes)
-app.include_router(vaccine_routes)
-app.include_router(food_restriction_routes)
-app.include_router(licensed_medicine_routes)
-app.include_router(pathological_background_routes)
-app.include_router(pathological_background_family_routes)
-app.include_router(constant_routes)
-app.include_router(payment_account_routes)
-app.include_router(staff_role_routes)
-app.include_router(school_routes)
-app.include_router(parent_routes)
-app.include_router(camper_routes)
-app.include_router(location_routes)
-app.include_router(season_routes)
-app.include_router(camp_router)
-app.include_router(extra_charge_routes)
-app.include_router(extra_question_routes)
-app.include_router(extra_answer_routes)
-app.include_router(camper_comment_router)
-app.include_router(camp_checkpoint_routes)
-app.include_router(camper_checkpoint_routes)
-app.include_router(payment_routes)
-app.include_router(payment_method_routes)
-app.include_router(payment_transaction_type_routes)
-app.include_router(camper_extra_charge_routes)
-app.include_router(staff_routes)
-app.include_router(staff_in_camp_routes)
-app.include_router(training_router)
-app.include_router(training_event_router)
-app.include_router(staff_in_training_router)
-app.include_router(files_routes)
-app.include_router(camper_record_routes)
-app.include_router(staff_record_routes)
-app.include_router(staff_comment_routes)
-app.include_router(email_template_routes)
-app.include_router(campaign_routes)
-app.include_router(mailing_routes)
-app.include_router(report_routes)
-app.include_router(trophy_routes)
-app.include_router(trophy_season_routes)
-app.include_router(trophy_staff_routes)
-app.include_router(medical_routes)
-app.include_router(role_routes) # Role
-app.include_router(user_routes) # User
-app.include_router(image_routes) # Image
-app.include_router(permission_routes) # Permission
-app.include_router(pdf_routes) #Pdf
-app.include_router(mercadopago_routes)
-app.include_router(grouping_router)
-app.include_router(grouping_type_router)
-app.include_router(grouping_camp_router)
-app.include_router(grouping_camper_router)
-app.include_router(email_routes) #email
+app.include_router(currency_routes, dependencies=auth_user)
+app.include_router(vaccine_routes, dependencies=auth_user)
+app.include_router(food_restriction_routes, dependencies=auth_user)
+app.include_router(licensed_medicine_routes, dependencies=auth_user)
+app.include_router(pathological_background_routes, dependencies=auth_user)
+app.include_router(pathological_background_family_routes, dependencies=auth_user)
+app.include_router(constant_routes, dependencies=auth_user)
+app.include_router(payment_account_routes, dependencies=auth_user)
+app.include_router(staff_role_routes, dependencies=auth_user)
+app.include_router(school_routes, dependencies=auth_user)
+app.include_router(parent_routes, dependencies=auth_user)
+app.include_router(camper_routes, dependencies=auth_user)
+app.include_router(location_routes, dependencies=auth_user)
+app.include_router(season_routes, dependencies=auth_user)
+app.include_router(camp_router, dependencies=auth_user)
+app.include_router(extra_charge_routes, dependencies=auth_user)
+app.include_router(extra_question_routes, dependencies=auth_user)
+app.include_router(extra_answer_routes, dependencies=auth_user)
+app.include_router(camper_comment_router, dependencies=auth_user)
+app.include_router(camp_checkpoint_routes, dependencies=auth_user)
+app.include_router(camper_checkpoint_routes, dependencies=auth_user)
+app.include_router(payment_routes, dependencies=auth_user)
+app.include_router(payment_method_routes, dependencies=auth_user)
+app.include_router(payment_transaction_type_routes, dependencies=auth_user)
+app.include_router(camper_extra_charge_routes, dependencies=auth_user)
+app.include_router(staff_routes, dependencies=auth_user)
+app.include_router(staff_in_camp_routes, dependencies=auth_user)
+app.include_router(training_router, dependencies=auth_user)
+app.include_router(training_event_router, dependencies=auth_user)
+app.include_router(staff_in_training_router, dependencies=auth_user)
+app.include_router(camper_record_routes, dependencies=auth_user)
+app.include_router(staff_record_routes, dependencies=auth_user)
+app.include_router(staff_comment_routes, dependencies=auth_user)
+app.include_router(email_template_routes, dependencies=auth_user)
+app.include_router(campaign_routes, dependencies=auth_user)
+app.include_router(mailing_routes, dependencies=auth_user)
+app.include_router(report_routes, dependencies=auth_user)
+app.include_router(trophy_routes, dependencies=auth_user)
+app.include_router(trophy_season_routes, dependencies=auth_user)
+app.include_router(trophy_staff_routes, dependencies=auth_user)
+app.include_router(medical_routes, dependencies=auth_user)
+app.include_router(role_routes, dependencies=auth_user) # Role
+app.include_router(user_routes, dependencies=auth_user) # User
+app.include_router(permission_routes, dependencies=auth_user) # Permission
+app.include_router(pdf_routes, dependencies=auth_user) #Pdf
+app.include_router(mercadopago_routes, dependencies=auth_user)
+app.include_router(grouping_router, dependencies=auth_user)
+app.include_router(grouping_type_router, dependencies=auth_user)
+app.include_router(grouping_camp_router, dependencies=auth_user)
+app.include_router(grouping_camper_router, dependencies=auth_user)
+app.include_router(email_routes, dependencies=auth_user) #email
+
+# Routers publicos: login, registro, recuperacion de cuenta, webhooks y archivos
 app.include_router(token_routes) # token
+app.include_router(user_public_routes)
+app.include_router(parent_public_routes)
+app.include_router(staff_public_routes)
+app.include_router(camper_public_routes)
+app.include_router(mercadopago_public_routes)
+app.include_router(email_public_routes)
+app.include_router(files_routes)
+app.include_router(image_routes) # Image
 app.mount("/media",StaticFiles(directory="media"),name="media")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
@@ -183,12 +192,12 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 
-@app.get("/remove_job/", tags=["Jobs"])
+@app.get("/remove_job/", tags=["Jobs"], dependencies=auth_user)
 def get_prospects():
     result = scheduler.remove_job("birthday_greeting_job")
     print("Job removed:", result)
     
-@app.get("/jobs", tags=["Jobs"])
+@app.get("/jobs", tags=["Jobs"], dependencies=auth_user)
 def list_jobs():
     """
     List all scheduled jobs (for debugging).
@@ -203,7 +212,7 @@ def list_jobs():
         })
     return {"jobs": jobs}
 
-@app.post("/run-birthday-job", tags=["Jobs"])
+@app.post("/run-birthday-job", tags=["Jobs"], dependencies=auth_user)
 def run_birthday_job():
     """
     Manually trigger the birthday greetings job.

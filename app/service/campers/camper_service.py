@@ -100,6 +100,8 @@ from utils.payments.payment_table import get_camper_total_balance, get_camper_ba
 from utils.db import db_mapping_rows_to_dict
 
 camper_routes = APIRouter()
+# Endpoints sin autenticacion (formulario de registro)
+camper_public_routes = APIRouter()
 
 
 def get_db():
@@ -236,7 +238,7 @@ def get_vaccine_by_camper_id(camper_id: int, db: Session = Depends(get_db)):
     return {"data": list_vaccine}
 
 
-@camper_routes.get("/camper_form/{language}")
+@camper_public_routes.get("/camper_form/{language}")
 def get_camperform(language: str, db: Session = Depends(get_db)):
     genders = get_all_gender_id_name(db, language)
     blood_type = get_all_blood_type_id_name(db, language)

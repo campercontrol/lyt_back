@@ -50,6 +50,8 @@ ROLE_DOCTOR_ID = int(os.getenv("ROLE_DOCTOR_ID"))
 
 
 user_routes = APIRouter()
+# Endpoints sin autenticacion (recuperacion y cambio de cuenta con token propio)
+user_public_routes = APIRouter()
 
 # Dependency
 
@@ -280,7 +282,7 @@ def update_user(
 #         return {"mensaje": "Ningun registro fue afectado", "data": ""}
 
 
-@user_routes.post("/user/send_mail_password_reset", tags=["Usuarios"])
+@user_public_routes.post("/user/send_mail_password_reset", tags=["Usuarios"])
 def reset_password(
     user_reset: UserSendMailResetPassword, response: Response, db: Session = Depends(get_db)
 ):
@@ -308,7 +310,7 @@ def reset_password(
         else:
             return {"detail": {"status": 3, "msg": "An error ocurred while sending email"}}
 
-@user_routes.post("/user/reset_password", tags=["Usuarios"])
+@user_public_routes.post("/user/reset_password", tags=["Usuarios"])
 def reset_password(
     user_reset: UserResetPassword, t: str, db: Session = Depends(get_db)
 ):
@@ -333,7 +335,7 @@ def reset_password(
     }}
 
 
-@user_routes.post("/user/verify/")
+@user_public_routes.post("/user/verify/")
 def verify_account(t: str, db: Session = Depends(get_db)):
     data = validate_token_general(t)
     if data[0] == 403:
@@ -357,7 +359,7 @@ def verify_account(t: str, db: Session = Depends(get_db)):
     }}
 
 
-@user_routes.post("/usuario/change_password/{email}", tags=["Usuarios"])
+@user_public_routes.post("/usuario/change_password/{email}", tags=["Usuarios"])
 def change_password(
     email: str,
     change_pass: UserChangePassword,
@@ -420,7 +422,7 @@ def change_password(
                 "data": "",
             }
 
-@user_routes.post("/usuario/change_email/{email}", tags=["Usuarios"])
+@user_public_routes.post("/usuario/change_email/{email}", tags=["Usuarios"])
 def change_email(
     email: str,
     change_pass: UserChangeEmail,
