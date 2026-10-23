@@ -61,6 +61,8 @@ CAMP_LOGO_BLACK_FILE_NAME = os.getenv("CAMP_LOGO_BLACK_FILE_NAME")
 PAYMENT_REFERENCE_EMAIL = os.getenv("PAYMENT_REFERENCE_EMAIL")
 
 parent_routes = APIRouter()
+# Endpoints sin autenticacion (registro de padres)
+parent_public_routes = APIRouter()
 
 def get_db():
     try:
@@ -101,7 +103,7 @@ def create_parent(new_parent:ParentCreate, db: Session =Depends(get_db)):
 #     return {"detail": {"status": 1, "msg": "Se creó correctamente la cuenta"}}
 
 
-@parent_routes.post("/parent_create/", tags=["Campers"])
+@parent_public_routes.post("/parent_create/", tags=["Campers"])
 def parent_complete(new_parent_complete:ParentCompleteCreate, db: Session =Depends(get_db)):
     
     result = create_parent_complete(db, new_parent_complete)

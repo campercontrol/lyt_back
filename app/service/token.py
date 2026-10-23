@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 from typing import Union
 
@@ -17,8 +18,8 @@ from utils.hash import verify_str_hash
 
 SECRET_KEY = "39d87423287d550c71e16d02fa7c4a522752a20bed9c505740b13aceeab5bf8a"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_MINUTES = 35
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+REFRESH_TOKEN_EXPIRE_MINUTES = int(os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES", 35))
 
 token_routes = APIRouter()
 

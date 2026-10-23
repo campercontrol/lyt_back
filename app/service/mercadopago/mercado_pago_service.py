@@ -7,6 +7,8 @@ from crud.mercadopago.mercadopago_crud import create_mercadopago_preference, get
 from utils.db import SessionLocal
 
 mercadopago_routes = APIRouter()
+# Endpoints sin autenticacion (notificaciones y callback OAuth de Mercado Pago)
+mercadopago_public_routes = APIRouter()
 
 def get_db():
     try:
@@ -24,7 +26,7 @@ def create_preference(camp_id : int, camper_id: int, customer_defined_amount: fl
     return response
     
 
-@mercadopago_routes.post("/mercado_pago/notify", tags=["mercadopago"])
+@mercadopago_public_routes.post("/mercado_pago/notify", tags=["mercadopago"])
 async def mercado_pago_payment_notification(request: Request, id: Optional[int] = None, topic: Optional[str] = None, db:Session = Depends(get_db)):
     result = await process_mp_notification(db, request)
     if result == 3:
@@ -33,7 +35,7 @@ async def mercado_pago_payment_notification(request: Request, id: Optional[int] 
         return {"status": 1, "msg": "Notification received"}
 
 
-@mercadopago_routes.get("/mercado_pago/seller/credentials", tags=["mercadopago"])
+@mercadopago_public_routes.get("/mercado_pago/seller/credentials", tags=["mercadopago"])
 def mercado_pago_seller_credentials(code: Optional[str] = None, state: Optional[str] = None, db:Session = Depends(get_db)):
     result = get_mercadopago_seller_credentials(db, code, state)  
     if result == 1:

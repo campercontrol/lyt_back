@@ -16,7 +16,6 @@ from crud.crud_user import (
     get_user_by_email,
     crud_update_user_by_email,
     search_user_by_email,
-    update_password_all_users,
     update_user_by_id,
     delete_user_by_id,
     get_user_info_by_email,
@@ -51,6 +50,8 @@ ROLE_DOCTOR_ID = int(os.getenv("ROLE_DOCTOR_ID"))
 
 
 user_routes = APIRouter()
+# Endpoints sin autenticacion (recuperacion y cambio de cuenta con token propio)
+user_public_routes = APIRouter()
 
 # Dependency
 
@@ -281,7 +282,7 @@ def update_user(
 #         return {"mensaje": "Ningun registro fue afectado", "data": ""}
 
 
-@user_routes.post("/user/send_mail_password_reset", tags=["Usuarios"])
+@user_public_routes.post("/user/send_mail_password_reset", tags=["Usuarios"])
 def reset_password(
     user_reset: UserSendMailResetPassword, response: Response, db: Session = Depends(get_db)
 ):
@@ -309,7 +310,7 @@ def reset_password(
         else:
             return {"detail": {"status": 3, "msg": "An error ocurred while sending email"}}
 
-@user_routes.post("/user/reset_password", tags=["Usuarios"])
+@user_public_routes.post("/user/reset_password", tags=["Usuarios"])
 def reset_password(
     user_reset: UserResetPassword, t: str, db: Session = Depends(get_db)
 ):
@@ -334,7 +335,7 @@ def reset_password(
     }}
 
 
-@user_routes.post("/user/verify/")
+@user_public_routes.post("/user/verify/")
 def verify_account(t: str, db: Session = Depends(get_db)):
     data = validate_token_general(t)
     if data[0] == 403:
@@ -358,7 +359,7 @@ def verify_account(t: str, db: Session = Depends(get_db)):
     }}
 
 
-@user_routes.post("/usuario/change_password/{email}", tags=["Usuarios"])
+@user_public_routes.post("/usuario/change_password/{email}", tags=["Usuarios"])
 def change_password(
     email: str,
     change_pass: UserChangePassword,
@@ -421,7 +422,7 @@ def change_password(
                 "data": "",
             }
 
-@user_routes.post("/usuario/change_email/{email}", tags=["Usuarios"])
+@user_public_routes.post("/usuario/change_email/{email}", tags=["Usuarios"])
 def change_email(
     email: str,
     change_pass: UserChangeEmail,
@@ -491,11 +492,6 @@ def get_search_user(search:str, db: Session = Depends(get_db)):
     possible_users  = search_user_by_email(db, search)
     return { "data": possible_users }
 
-
-@user_routes.post("/update/all/password/", tags=["Usuarios"])
-def update_all_users_pass(hash_pass:str, db: Session = Depends(get_db)):
-    result = update_password_all_users(db, hash_pass)
-    return {"data": result}
 
 @user_routes.delete("/delete_usuario/{user_id}", tags=["Usuarios"])
 def delete_user(user_id:str, db: Session = Depends(get_db)):
