@@ -68,7 +68,7 @@ class ParentCreate(BaseModel):
         max_lenght=75
     ) 
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class ParentModify(BaseModel):
@@ -131,7 +131,7 @@ class ParentModify(BaseModel):
         max_lenght=75
     )  
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class ParentCompleteCreate(BaseModel):

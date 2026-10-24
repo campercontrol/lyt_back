@@ -24,7 +24,7 @@ class CampExtraChargeCreate(BaseModel):
         title="Campamento"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -47,10 +47,10 @@ class CampExtraChargeModify(BaseModel):
         title="Campamento"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 

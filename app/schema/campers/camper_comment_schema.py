@@ -32,7 +32,7 @@ class CamperCommentCreate(BaseModel):
         title= "Camper id"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class CamperCommentModify(BaseModel):
@@ -61,7 +61,7 @@ class CamperCommentModify(BaseModel):
         title= "Camper id"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
     
     

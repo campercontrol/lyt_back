@@ -23,7 +23,7 @@ class CamperExtraAnswerCreate(BaseModel):
         title="Pregunta extra"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 class UpdateCamperExtraAnswer(BaseModel):
     id: int = Field(
@@ -49,7 +49,7 @@ class CamperExtraAnswerModify(BaseModel):
         title="Pregunta extra"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class ExtraAnswerListCreate(BaseModel):

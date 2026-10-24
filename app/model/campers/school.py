@@ -34,10 +34,10 @@ class School(Base):
     contact_third_email = Column(String(512), doc="Tercer email de contacto de la escuela")
     verify = Column(Boolean, nullable=False)
     active = Column(Boolean, nullable=False)
-    created_at = Column("created", DateTime(timezone=True), default=datetime.now())
+    created_at = Column("created", DateTime(timezone=True), default=datetime.now)
     updated_at = Column(
         "updated", 
         DateTime(timezone=True),
-        default=datetime.now(),
-        onupdate=datetime.now(),
+        default=datetime.now,
+        onupdate=datetime.now,
     )

@@ -19,7 +19,7 @@ class SeasonCreate(BaseModel):
         title="Temporada actual"
     )
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class SeasonModify(BaseModel):
@@ -38,5 +38,5 @@ class SeasonModify(BaseModel):
         title="Temporada actual"
     )
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

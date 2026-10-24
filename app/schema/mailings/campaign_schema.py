@@ -60,7 +60,7 @@ class CampaignCreate(BaseModel):
     )
 
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -118,7 +118,7 @@ class CampaignModify(BaseModel):
     )
 
     updated_at: Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class MailingTypeSelect(BaseModel):
@@ -189,7 +189,7 @@ class CamperCampaignCreate(BaseModel):
         title = "Camper"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class StaffCampaignCreate(BaseModel):
@@ -215,7 +215,7 @@ class StaffCampaignCreate(BaseModel):
         title =  "Temporada"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class SchoolCampignCreate(BaseModel):
@@ -235,5 +235,5 @@ class SchoolCampignCreate(BaseModel):
         title = "Escuela"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

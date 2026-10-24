@@ -25,7 +25,7 @@ class CamperCheckpointCreate(BaseModel):
         title="Campamento"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -49,6 +49,6 @@ class CamperCheckpointModify(BaseModel):
         title="Campamento"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 

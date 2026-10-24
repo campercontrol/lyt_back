@@ -30,7 +30,7 @@ class TrainingCreate(BaseModel):
         title="Activo"
     )    
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -59,5 +59,5 @@ class TrainingModify(BaseModel):
         title="Activo"
     )    
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

@@ -81,7 +81,7 @@ class ProspectCreate(BaseModel):
         default=1
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class ProspectCompleteCreate(BaseModel):
@@ -196,7 +196,7 @@ class StaffModify(BaseModel):
         default=1   
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class StaffCatalog(BaseModel):
