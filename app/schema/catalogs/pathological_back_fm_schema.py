@@ -21,7 +21,7 @@ class PathologicalBackgroundFamilyCreate(BaseModel):
     assigned_id:int
     order:int
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -35,5 +35,5 @@ class PathologicalBackgroundFamilyModify(BaseModel):
     assigned_id:int
     order:int
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

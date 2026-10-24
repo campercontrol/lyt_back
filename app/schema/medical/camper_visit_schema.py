@@ -73,7 +73,7 @@ class CamperVisitCreate(BaseModel):
         default=None   
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class CamperVisitModify(BaseModel):
@@ -141,5 +141,5 @@ class CamperVisitModify(BaseModel):
         default=None
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

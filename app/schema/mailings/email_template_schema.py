@@ -31,7 +31,7 @@ class EmailTemplateCreate(BaseModel):
     )
 
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -60,5 +60,5 @@ class EmailTemplateModify(BaseModel):
     )
     
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

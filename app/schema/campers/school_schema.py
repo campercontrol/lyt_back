@@ -84,7 +84,7 @@ class SchoolCreate(BaseModel):
         title="Activa"
     ) 
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -159,7 +159,7 @@ class SchoolModify(BaseModel):
         title="Activa"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class UpdateSchool(BaseModel):

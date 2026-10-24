@@ -24,7 +24,7 @@ class CamperInCampCreate(BaseModel):
         title= "Camper id"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class CamperInCampModify(BaseModel):
@@ -45,5 +45,5 @@ class CamperInCampModify(BaseModel):
         title= "Camper id"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

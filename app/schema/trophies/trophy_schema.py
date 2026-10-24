@@ -27,7 +27,7 @@ class TrophyCreate(BaseModel):
         title = "Tipo de trofeo"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class TrophyModify(BaseModel):
@@ -52,7 +52,7 @@ class TrophyModify(BaseModel):
         title = "Tipo de trofeo"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -69,7 +69,7 @@ class TrophySeasonCreate(BaseModel):
         title= "Trofeo para ser asignado"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
     
 
@@ -87,7 +87,7 @@ class TrophySeasonModify(BaseModel):
         title= "Trofeo para ser asignado"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
     
 
@@ -104,7 +104,7 @@ class TrophyStaffCreate(BaseModel):
         title="Staff"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class TrophyStaffModify(BaseModel):
@@ -120,5 +120,5 @@ class TrophyStaffModify(BaseModel):
         title="Staff"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

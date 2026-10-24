@@ -22,8 +22,8 @@ class MercadopagoPreferenceCreate(BaseModel):
         title="Id del campamento"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

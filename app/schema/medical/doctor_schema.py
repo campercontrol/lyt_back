@@ -27,7 +27,7 @@ class DoctorCreate(BaseModel):
         title="Usuario"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class DoctorModify(BaseModel):
@@ -52,5 +52,5 @@ class DoctorModify(BaseModel):
         title="Usuario"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

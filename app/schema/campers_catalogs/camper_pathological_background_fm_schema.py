@@ -23,7 +23,7 @@ class CamperPathologicalBackFmCreate(BaseModel):
         title='ACtivo en el camper'
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class CamperPathologicalBackFmModify(BaseModel):
@@ -44,5 +44,5 @@ class CamperPathologicalBackFmModify(BaseModel):
         title='ACtivo en el camper'
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

@@ -122,7 +122,7 @@ class CamperCreate(BaseModel):
     #     title="Record de campamentos del camper"
     # )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class CamperModify(BaseModel):
@@ -241,7 +241,7 @@ class CamperModify(BaseModel):
         title="Record de campamentos del camper"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class CamperCatalog(BaseModel):

@@ -23,19 +23,19 @@ class CampCreate(BaseModel):
     )
     start: datetime = Field(
         title="Inicio del campamento",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     end: datetime = Field(
         title="Fin del campamento",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     start_registration: datetime = Field(
         title="Inicio de registro",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     end_registration: datetime = Field(
         title="Fin de registro",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     registration: bool = Field(
         title="Registro abierto"
@@ -118,7 +118,7 @@ class CampCreate(BaseModel):
     )
     
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -135,19 +135,19 @@ class CampModify(BaseModel):
     )
     start: datetime = Field(
         title="Inicio del campamento",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     end: datetime = Field(
         title="Fin del campamento",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     start_registration: datetime = Field(
         title="Inicio de registro",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     end_registration: datetime = Field(
         title="Fin de registro",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     registration: bool = Field(
         title="Registro abierto"
@@ -219,7 +219,7 @@ class CampModify(BaseModel):
         title="Temporada del campamento"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 class MailingCamps(BaseModel):
     id: int
@@ -245,10 +245,10 @@ class CampDiscountCreate(BaseModel):
         title = "Id del campamento"
     )
     date_start:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
     date_end:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 

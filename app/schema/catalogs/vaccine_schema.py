@@ -21,7 +21,7 @@ class VaccineCreate(BaseModel):
     assigned_id:int
     order:int
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
     
 class VaccineModify(BaseModel):
@@ -33,7 +33,7 @@ class VaccineModify(BaseModel):
     assigned_id:int
     order:int
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
     
 

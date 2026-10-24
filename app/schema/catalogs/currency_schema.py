@@ -27,7 +27,7 @@ class CurrencyCreate(BaseModel):
         max_lenght= 10,
     )
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -53,5 +53,5 @@ class CurrencyModify(BaseModel):
         max_lenght= 10,
     )
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

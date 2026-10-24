@@ -29,7 +29,7 @@ class ConstantCreate(BaseModel):
         title='Tipo de constante'        
     )
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -57,5 +57,5 @@ class ConstantModify(BaseModel):
         title='Tipo de constante'        
     )
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

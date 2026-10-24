@@ -28,7 +28,7 @@ class StaffCommentCreate(BaseModel):
         title= "Staff id"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class StaffCommentModify(BaseModel):
@@ -54,5 +54,5 @@ class StaffCommentModify(BaseModel):
         title= "Staff id"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

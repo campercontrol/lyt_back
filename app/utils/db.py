@@ -12,14 +12,7 @@ host = os.getenv("DB_HOST", "")
 port = os.getenv("DB_PORT", "")
 db = os.getenv("DB_NAME", "")
 
-print(f"user {user}")
-print(f"password {password}")
-print(f"host {host}")
-print(f"port {port}")
-print(f"db {db}")
-
 SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
-print(SQLALCHEMY_DATABASE_URL)
 #SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"options": "-c timezone=America/Mexico_City"})
