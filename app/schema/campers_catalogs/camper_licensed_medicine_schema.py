@@ -23,7 +23,7 @@ class CamperLicensedMedicineCreate(BaseModel):
         title='ACtivo en el camper'
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class CamperLicensedMedicineModify(BaseModel):
@@ -44,5 +44,5 @@ class CamperLicensedMedicineModify(BaseModel):
         title='ACtivo en el camper'
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

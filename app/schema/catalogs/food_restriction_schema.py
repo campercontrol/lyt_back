@@ -21,7 +21,7 @@ class FoodRestrictionCreate(BaseModel):
     assigned_id:int
     order:int
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -35,5 +35,5 @@ class FoodRestrictionModify(BaseModel):
     assigned_id:int
     order:int
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

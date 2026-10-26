@@ -20,7 +20,7 @@ class CamperExtraChargeCreate(BaseModel):
         title="Cargo Extra"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -41,7 +41,7 @@ class CamperExtraChargeModify(BaseModel):
         title="Cargo Extra"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class UpdateCamperExtraCharge(BaseModel):

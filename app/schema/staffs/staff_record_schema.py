@@ -22,7 +22,7 @@ class StaffRecordCreate(BaseModel):
         title="Campamentos en total"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -43,6 +43,6 @@ class StaffRecordModify(BaseModel):
         title="Campamentos en total"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 

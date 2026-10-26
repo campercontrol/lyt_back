@@ -14,11 +14,11 @@ class TrainingEventCreate(BaseModel):
     ) 
     start: datetime = Field(
         title="Inicio del campamento",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     end: datetime = Field(
         title="Fin del campamento",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     location: str = Field(
         title="Foto",
@@ -37,7 +37,7 @@ class TrainingEventCreate(BaseModel):
         title= "Tipo de capacitación id"
     )    
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -50,11 +50,11 @@ class TrainingEventModify(BaseModel):
     ) 
     start: datetime = Field(
         title="Inicio del campamento",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     end: datetime = Field(
         title="Fin del campamento",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     location: str = Field(
         title="Foto",
@@ -73,5 +73,5 @@ class TrainingEventModify(BaseModel):
         title= "Tipo de capacitación id"
     )   
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

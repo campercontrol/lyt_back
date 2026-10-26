@@ -26,7 +26,7 @@ class StaffRoleCreate(BaseModel):
         max_lenght=15,
     )
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -50,5 +50,5 @@ class StaffRoleModify(BaseModel):
         max_lenght=15,
     )
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

@@ -23,7 +23,7 @@ class CampExtraQuestionCreate(BaseModel):
         title="Campamento"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -45,6 +45,6 @@ class CampExtraQuestionModify(BaseModel):
         title="Campamento"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 

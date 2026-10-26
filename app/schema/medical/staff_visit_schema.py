@@ -54,7 +54,7 @@ class StaffVisitCreate(BaseModel):
         title="Consulta medica principal"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class StaffVisitModify(BaseModel):
@@ -121,5 +121,5 @@ class StaffVisitModify(BaseModel):
         title="Consulta medica principal"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

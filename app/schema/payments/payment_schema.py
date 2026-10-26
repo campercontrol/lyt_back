@@ -19,7 +19,7 @@ class PaymentCreate(BaseModel):
     
     payment_date: date = Field(
         title = "Fecha del pago",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     txn_number: str = Field(
         title= "Numero de transacción",
@@ -44,7 +44,7 @@ class PaymentCreate(BaseModel):
         title="Tipo de transacción"
     ) 
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -81,7 +81,7 @@ class PaymentModify(BaseModel):
         title="Tipo de transacción"
     ) 
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 class MassivePayment(BaseModel):
     id:Optional[int] = Field(
@@ -96,7 +96,7 @@ class MassivePayment(BaseModel):
     payment_amount: condecimal(decimal_places= 2) # type: ignore
     payment_date: date = Field(
         title = "Fecha del pago",
-        default=datetime.now()
+        default_factory=datetime.now
     )
     txn_number: str = Field(
         title= "Numero de transacción",
@@ -109,10 +109,10 @@ class MassivePayment(BaseModel):
         title="Tipo de transacción"
     ) 
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 class MassivePaymentCreate(BaseModel):
     campers: list[int] = Field(

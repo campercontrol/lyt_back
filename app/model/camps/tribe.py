@@ -11,6 +11,6 @@ class Tribe(Base):
     updated_at = Column(
         "updated", 
         DateTime(timezone=True),
-        default=datetime.now(),
-        onupdate=datetime.now(),
+        default=datetime.now,
+        onupdate=datetime.now,
     )

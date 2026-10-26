@@ -19,7 +19,7 @@ class PaymentTransactionTypeCreate(BaseModel):
         title= "Numero de movimiento"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -37,5 +37,5 @@ class PaymentTransactionTypeModify(BaseModel):
         title= "Numero de movimiento"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

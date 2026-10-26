@@ -31,7 +31,7 @@ class PaymentAccountCreate(BaseModel):
         max_length=18        
     )
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -60,5 +60,5 @@ class PaymentAccountModify(BaseModel):
         max_length=18
     )
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

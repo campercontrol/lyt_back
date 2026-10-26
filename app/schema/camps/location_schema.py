@@ -38,7 +38,7 @@ class LocationCreate(BaseModel):
         title="Activa"
     )
     created_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 class LocationModify(BaseModel):
@@ -70,5 +70,5 @@ class LocationModify(BaseModel):
         title="Activa"
     )
     updated_at:datetime = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )

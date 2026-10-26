@@ -470,21 +470,6 @@ def search_user_by_email(db: Session, search: str):
     else:
         return "Data not found"
 
-def update_password_all_users(db, hashed_pass:str):
-    users= (
-        db.query(
-            User
-        )
-        .all()
-    )
-    for user in users:
-        user.hashed_pass = hashed_pass
-
-    db.commit()
-
-    # "$2b$12$9QchmEH2rcRnHlfBnGe7ZunGbonntZc/RX2NHgClT7YSiakHRy.Pm"
-    return 1
-
 def update_user_by_id(db: Session, user_id:int, user_data):
     
     print(user_data)

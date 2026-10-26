@@ -27,7 +27,7 @@ class CampDiscountCreate(BaseModel):
         title="Campamento"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -53,6 +53,6 @@ class CampDiscountModify(BaseModel):
         title="Campamento"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 

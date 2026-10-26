@@ -16,7 +16,7 @@ class PaymentMethodCreate(BaseModel):
         title= "Nombre del metodo de pago"
     )
     created_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
 
 
@@ -31,5 +31,5 @@ class PaymentMethodModify(BaseModel):
         title= "Nombre del metodo de pago"
     )
     updated_at:Optional[datetime] = Field(
-        default=datetime.now()
+        default_factory=datetime.now
     )
