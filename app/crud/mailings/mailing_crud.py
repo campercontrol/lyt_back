@@ -21,7 +21,7 @@ from model.payments.payment import Payment
 from model.payments.payment_method import PaymentMethod
 from model.payments.payment_transaction_type import PaymentTransactionType
 from utils.db import db_mapping_rows_to_dict
-from utils.payments.payment_table import create_payment_table
+from utils.payments.payment_table import create_payment_table, get_camper_balance_per_camp
 from crud.campers.parent_crud import get_parent_by_camper_id, get_second_tutor_by_camper_id
 
 
@@ -171,7 +171,8 @@ def get_camper_context_massive_mail(db: Session, camp_id: int, camper_id):
         "txn_type": "",
         "txn_number": ""
     }
-    formated_balance = camp_total_balance.symbol + "{:,.1f}".format(abs(camp_total_balance.payment_balance)) + camp_total_balance.acronyms
+    camper_balance = get_camper_balance_per_camp(db, camper_id, camp_id)
+    formated_balance = camp_total_balance.symbol + "{:,.2f}".format(camper_balance) + camp_total_balance.acronyms
     
     context = {
         "camper": camper_info,
@@ -201,7 +202,8 @@ def get_camper_context_second_parent_massive_mail(db: Session, camp_id: int, cam
         "txn_type": "",
         "txn_number": ""
     }
-    formated_balance = camp_total_balance.symbol + "{:,.1f}".format(abs(camp_total_balance.payment_balance)) + camp_total_balance.acronyms
+    camper_balance = get_camper_balance_per_camp(db, camper_id, camp_id)
+    formated_balance = camp_total_balance.symbol + "{:,.2f}".format(camper_balance) + camp_total_balance.acronyms
     
     context = {
         "camper": camper_info,
