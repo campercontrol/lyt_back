@@ -8,7 +8,7 @@ from model.campers.parent import Parent
 from model.camps import Camp, CamperInCamp
 from model.catalogs.currency import Currency
 
-from utils.payments.payment_table import get_payment_table, create_payment_table
+from utils.payments.payment_table import get_payment_table, create_payment_table, get_camper_balance_per_camp
 from utils.db import db_mapping_rows_to_dict
 from helper.mailing_helpers import send_mail_template_payment
 
@@ -56,7 +56,7 @@ def create_payment_controller(db: Session, new_payment):
         db.commit()
         db.refresh(payment_created)
         
-        camper_balance = (db.query(CamperInCamp.payment_balance).select_from(CamperInCamp).filter(and_(CamperInCamp.camper_id == camper_id, CamperInCamp.camp_id == camp_id)).first())
+        camper_balance = get_camper_balance_per_camp(db, camper_id, camp_id)
         
         db_payment = get_camper_payment_in_camp_by_payment_id(db, payment_created.id)
         
@@ -74,7 +74,7 @@ def create_payment_controller(db: Session, new_payment):
         
         email_context["payments"] = payment_table
         
-        if camper_balance.payment_balance <= 0:       
+        if camper_balance <= 0:       
             send_mail_template_payment(db, email_context["user"]["email"], USER_TOTAL_PAYMENT_TEMPLATE_ID, email_context)
             email_context["user"] = get_second_parent_info_mailing_by_camper_id(db, camper_id)
             send_mail_template_payment(db, email_context["user"]["email"], USER_TOTAL_PAYMENT_TEMPLATE_ID, email_context)
@@ -139,12 +139,12 @@ def create_new_payment_and_update_balance(db, new_payment: PaymentCreate):
         db.add(db_payment)
         db.commit()
         if db_payment.txn_type_id in (TRANSACTION_TYPE_CAMP_PAYMENT_ID,TRANSACTION_TYPE_CAMP_MANUAL_DISCOUNT_ID,TRANSACTION_TYPE_CAMP_DISCOUNT_UPFRONT_PAYMENT_ID):
-            total_balance = abs(camper_in_camp.payment_balance) - abs(float(db_payment.payment_amount))
+            total_balance = camper_in_camp.payment_balance - abs(float(db_payment.payment_amount))
             camper_in_camp.payment_balance = total_balance
             db.add(camper_in_camp) 
             db.commit()
         else:
-            total_balance = abs(camper_in_camp.payment_balance) + abs(float(db_payment.payment_amount))
+            total_balance = camper_in_camp.payment_balance + abs(float(db_payment.payment_amount))
             camper_in_camp.payment_balance = total_balance
             db.add(camper_in_camp) 
             db.commit()            
@@ -170,11 +170,11 @@ def create_new_payment_and_update_balance_transaction(db, new_payment: PaymentCr
     db.add(db_payment)
     db.flush()
     if db_payment.txn_type_id in (TRANSACTION_TYPE_CAMP_PAYMENT_ID,TRANSACTION_TYPE_CAMP_MANUAL_DISCOUNT_ID,TRANSACTION_TYPE_CAMP_DISCOUNT_UPFRONT_PAYMENT_ID):
-        total_balance = abs(camper_in_camp.payment_balance) - abs(float(db_payment.payment_amount))
+        total_balance = camper_in_camp.payment_balance - abs(float(db_payment.payment_amount))
         camper_in_camp.payment_balance = total_balance
         db.add(camper_in_camp) 
     else:
-        total_balance = abs(camper_in_camp.payment_balance) + abs(float(db_payment.payment_amount))
+        total_balance = camper_in_camp.payment_balance + abs(float(db_payment.payment_amount))
         camper_in_camp.payment_balance = total_balance
         db.add(camper_in_camp) 
     db.flush()
@@ -185,12 +185,12 @@ def delete_payment_and_update_balance_transaction(db: Session, payment_id: int, 
     payment = get_payment_by_id(db, payment_id)
     camper_in_camp = db.query(CamperInCamp).filter(and_(CamperInCamp.camp_id == payment.camp_id, CamperInCamp.camper_id == camper_id)).first()
     if payment.txn_type_id in (TRANSACTION_TYPE_CAMP_PAYMENT_ID,TRANSACTION_TYPE_CAMP_MANUAL_DISCOUNT_ID,TRANSACTION_TYPE_CAMP_DISCOUNT_UPFRONT_PAYMENT_ID):
-        total_balance = abs(camper_in_camp.payment_balance) + abs(float(payment.payment_amount))
+        total_balance = camper_in_camp.payment_balance + abs(float(payment.payment_amount))
         camper_in_camp.payment_balance = total_balance
         db.add(camper_in_camp)
         db.delete(payment)
     else:
-        total_balance = abs(camper_in_camp.payment_balance) - abs(float(payment.payment_amount))
+        total_balance = camper_in_camp.payment_balance - abs(float(payment.payment_amount))
         camper_in_camp.payment_balance = total_balance
         db.add(camper_in_camp) 
         db.delete(payment)        
@@ -200,13 +200,13 @@ def delete_payment_and_update_balance(db: Session, payment_id: int, camper_id):
     camper_in_camp = db.query(CamperInCamp).filter(and_(CamperInCamp.camp_id == payment.camp_id, CamperInCamp.camper_id == camper_id)).first()
     try:
         if payment.txn_type_id in (TRANSACTION_TYPE_CAMP_PAYMENT_ID,TRANSACTION_TYPE_CAMP_MANUAL_DISCOUNT_ID,TRANSACTION_TYPE_CAMP_DISCOUNT_UPFRONT_PAYMENT_ID):
-            total_balance = abs(camper_in_camp.payment_balance) + abs(float(payment.payment_amount))
+            total_balance = camper_in_camp.payment_balance + abs(float(payment.payment_amount))
             camper_in_camp.payment_balance = total_balance
             db.add(camper_in_camp)
             db.delete(payment)
             db.commit()
         else:
-            total_balance = abs(camper_in_camp.payment_balance) - abs(float(payment.payment_amount))
+            total_balance = camper_in_camp.payment_balance - abs(float(payment.payment_amount))
             camper_in_camp.payment_balance = total_balance
             db.add(camper_in_camp) 
             db.delete(payment)
@@ -240,11 +240,11 @@ def update_payment_controller(db, payment_id: int, modify_payment: PaymentModify
             camper_in_camp.payment_balance -= abs(current_payment.payment_amount)
         
         if modify_payment.txn_type_id in (TRANSACTION_TYPE_CAMP_PAYMENT_ID,TRANSACTION_TYPE_CAMP_MANUAL_DISCOUNT_ID,TRANSACTION_TYPE_CAMP_DISCOUNT_UPFRONT_PAYMENT_ID):
-            total_balance = abs(camper_in_camp.payment_balance) - abs(float(modify_payment.payment_amount))
+            total_balance = camper_in_camp.payment_balance - abs(float(modify_payment.payment_amount))
             camper_in_camp.payment_balance = total_balance
             db.add(camper_in_camp) 
         else:
-            total_balance = abs(camper_in_camp.payment_balance) + abs(float(modify_payment.payment_amount))
+            total_balance = camper_in_camp.payment_balance + abs(float(modify_payment.payment_amount))
             camper_in_camp.payment_balance = total_balance
             db.add(camper_in_camp)
         
@@ -254,7 +254,7 @@ def update_payment_controller(db, payment_id: int, modify_payment: PaymentModify
         
         payment_updated = get_camper_payment_in_camp_by_payment_id(db, payment_id)
                 
-        formated_payment_amount = "{:,.1f}".format(abs(payment_updated.payment_amount))
+        formated_payment_amount = "{:,.2f}".format(abs(payment_updated.payment_amount))
         
         email_context = get_camper_context_massive_mail(db, modify_payment.camp_id, modify_payment.camper_id)
         
@@ -270,7 +270,7 @@ def update_payment_controller(db, payment_id: int, modify_payment: PaymentModify
         email_context["payments"] = payment_table
         
         
-        if camper_in_camp.payment_balance <= 0:       
+        if get_camper_balance_per_camp(db, modify_payment.camper_id, modify_payment.camp_id) <= 0:       
             send_mail_template_payment(db, email_context["user"]["email"], USER_TOTAL_PAYMENT_TEMPLATE_ID, email_context)
             email_context["user"] = get_second_parent_info_mailing_by_camper_id(db, modify_payment.camper_id)
             send_mail_template_payment(db, email_context["user"]["email"], USER_TOTAL_PAYMENT_TEMPLATE_ID, email_context)
@@ -501,12 +501,12 @@ def apply_massive_payment(db: Session, camp_id: int, massivePayment):
             db.add(db_payment)
             db.commit()
             if db_payment.txn_type_id in (TRANSACTION_TYPE_CAMP_PAYMENT_ID,TRANSACTION_TYPE_CAMP_MANUAL_DISCOUNT_ID,TRANSACTION_TYPE_CAMP_DISCOUNT_UPFRONT_PAYMENT_ID):
-                total_balance = abs(camper_in_camp.payment_balance) - abs(float(db_payment.payment_amount))
+                total_balance = camper_in_camp.payment_balance - abs(float(db_payment.payment_amount))
                 camper_in_camp.payment_balance = total_balance
                 db.add(camper_in_camp) 
                 db.commit()
             else:
-                total_balance = abs(camper_in_camp.payment_balance) + abs(float(db_payment.payment_amount))
+                total_balance = camper_in_camp.payment_balance + abs(float(db_payment.payment_amount))
                 camper_in_camp.payment_balance = total_balance
                 db.add(camper_in_camp) 
                 db.commit()            
