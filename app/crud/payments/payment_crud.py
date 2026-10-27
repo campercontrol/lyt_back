@@ -254,7 +254,7 @@ def update_payment_controller(db, payment_id: int, modify_payment: PaymentModify
         
         payment_updated = get_camper_payment_in_camp_by_payment_id(db, payment_id)
                 
-        formated_payment_amount = "{:,.1f}".format(abs(payment_updated.payment_amount))
+        formated_payment_amount = "{:,.2f}".format(abs(payment_updated.payment_amount))
         
         email_context = get_camper_context_massive_mail(db, modify_payment.camp_id, modify_payment.camper_id)
         
