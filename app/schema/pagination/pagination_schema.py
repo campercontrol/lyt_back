@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from enum import Enum
+from typing import Optional
 
 class SortEnum(Enum):
     ASC = 'asc'
@@ -15,5 +16,6 @@ class PaginationOut(BaseModel):
     page: int
     offset: int
     order: SortEnum
+    sort_field: Optional[str] = None
 
     

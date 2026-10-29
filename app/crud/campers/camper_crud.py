@@ -26,7 +26,7 @@ from model.camps import CampExtraCharge
 
 from schema.campers.camper_schema import CamperCreate, CamperModify
 from schema.pagination.pagination_schema import SortEnum
-from helper.pagination_helpers import get_number_of_pages
+from helper.pagination_helpers import get_number_of_pages, build_order_by
 
 def get_all_camper(db: Session) -> any:
     rows = db.query(Camper).all()
@@ -347,6 +347,14 @@ def search_camper_by_name_user(db: Session, search: str):
 
 
 
+CAMPER_ADMIN_SORT_MAP = {
+    "camper_name": func.concat(Camper.name, ' ', Camper.lastname_father, ' ', Camper.lastname_mother),
+    "school": School.name,
+    "updated": Camper.updated_at,
+    "tutor_fullname": func.concat(Parent.tutor_name, ' ', Parent.tutor_lastname_father, ' ', Parent.tutor_lastname_mother),
+    "tutor_email": User.email,
+}
+
 def get_all_camper_admin(db: Session, pagination):
     order = desc if pagination.order == SortEnum.DESC else asc
     query = (
@@ -371,7 +379,7 @@ def get_all_camper_admin(db: Session, pagination):
         .join(Parent, Parent.id == Camper.parent_id)
         .join(User, User.id == Parent.user_id)
         .join(School, School.id == Camper.school_id)
-        .order_by(order(Camper.created_at))
+        .order_by(*build_order_by(pagination, CAMPER_ADMIN_SORT_MAP, [order(Camper.created_at)], Camper.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
     )
@@ -424,7 +432,7 @@ def search_all_camper_admin(db: Session, pagination, camper_name: str, camper_la
                 Parent.contact_email.op('%')(tutor_2_email),
             ) 
         )
-        .order_by(
+        .order_by(*build_order_by(pagination, CAMPER_ADMIN_SORT_MAP, [
             func.similarity(Camper.name, camper_name).desc(),
             func.similarity(Camper.lastname_father, camper_lastname_father).desc(),
             func.similarity(Camper.lastname_mother, camper_lastname_mother).desc(),
@@ -436,7 +444,7 @@ def search_all_camper_admin(db: Session, pagination, camper_name: str, camper_la
             func.similarity(Parent.contact_lastname_father, tutor_2_lastname_father).desc(),
             func.similarity(Parent.contact_lastname_mother, tutor_2_lastname_mother).desc(),
             func.similarity(Parent.contact_email, tutor_2_email).desc(),
-        )
+        ], Camper.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
     )

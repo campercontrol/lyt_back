@@ -50,7 +50,7 @@ from crud.staff_catalogs.staff_food_restriction_crud import get_all_staff_food_r
 from crud.staff_catalogs.staff_vaccine_crud import get_staff_all_vaccines_by_staff_id
 from crud.groupings.grouping_camp_crud import get_camper_groupings_by_camper_id_and_camp_id
 from crud.payments.payment_crud import delete_payment_and_update_balance_transaction, create_new_payment_and_update_balance_transaction
-from helper.pagination_helpers import pagination_params, get_number_of_pages
+from helper.pagination_helpers import pagination_params, get_number_of_pages, build_order_by
 from crud.campers.camper_extra_answer_crud import get_extra_answer_by_camper_camp
 from utils.payments.payment_table import get_camper_balance_per_camp
 
@@ -889,6 +889,17 @@ def get_all_camp(db: Session, pagination: Pagination):
 
     
 
+ACTIVE_CAMP_SORT_MAP = {
+    "camp_name": Camp.name,
+    "camp_public_price": Camp.public_price,
+    "location_name": Location.name,
+    "school_name": School.name,
+    "camp_start": Camp.start,
+    "camp_end": Camp.end,
+    "photo_password": Camp.photo_password,
+    "active": Camp.active,
+}
+
 def get_all_active_camp(db: Session, pagination):
     camps = []
     order = desc if pagination.order == SortEnum.DESC else asc
@@ -912,7 +923,7 @@ def get_all_active_camp(db: Session, pagination):
         .join(Location, Location.id == Camp.location_id)
         .join(School, School.id == Camp.school_id)
         .join(Currency, Currency.id == Camp.currency_id)
-        .order_by(order(Camp.created_at))
+        .order_by(*build_order_by(pagination, ACTIVE_CAMP_SORT_MAP, [order(Camp.created_at)], Camp.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
     )
@@ -1009,11 +1020,11 @@ def search_all_active_camp(db: Session, pagination, name, location, school):
                 School.name.op('%')(school),
                 Location.name.op('%')(location),
         ))
-        .order_by(        
+        .order_by(*build_order_by(pagination, ACTIVE_CAMP_SORT_MAP, [
             func.similarity(Camp.name, name).desc(),
             func.similarity(School.name, school).desc(),
             func.similarity(Location.name, location).desc()
-        )
+        ], Camp.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
     )
