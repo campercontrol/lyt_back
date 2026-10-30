@@ -27,7 +27,7 @@ from crud.staff_catalogs.staff_vaccine_crud import get_staff_all_vaccines_by_sta
 from crud.staff_catalogs.staff_food_restriction_crud import get_all_staff_food_restriction_by_id
 from crud.crud_role import get_role_by_uuid
 from crud.crud_user import get_profile_id_by_user_id
-from helper.pagination_helpers import pagination_params, get_number_of_pages
+from helper.pagination_helpers import pagination_params, get_number_of_pages, build_order_by
 from helper.mailing_helpers import send_mail_template
 from utils.functions_jwt import create_user_verification_url
 
@@ -35,6 +35,27 @@ ADMIN_NEW_PROSPECT_TEMPLATE = int(os.getenv("ADMIN_NEW_PROSPECT_TEMPLATE"))
 WELCOME_PROSPECT_TEMPLATE = int(os.getenv("WELCOME_PROSPECT_TEMPLATE"))
 ROLE_STAFF_ID = int(os.getenv("ROLE_STAFF_ID"))
 
+
+STAFF_FULL_NAME = func.concat(Staff.name, ' ', Staff.lastname_father, ' ', Staff.lastname_mother)
+
+PROSPECT_SORT_MAP = {
+    "name": STAFF_FULL_NAME,
+    "lastname_father": Staff.lastname_father,
+    "birthday": Staff.birthday,
+    "email": User.email,
+    "season_name": Season.name,
+}
+
+STAFF_SORT_MAP = {
+    "Staff.name": STAFF_FULL_NAME,
+    "combined": STAFF_FULL_NAME,
+    "Staff.birthday": Staff.birthday,
+    "Staff.cellphone": Staff.cellphone,
+    "Staff.facebook": Staff.facebook,
+    "email": User.email,
+    "season_name": Season.name,
+    "total": StaffRecord.total,
+}
 
 def get_all_prospect(db, pagination):
     order = desc if pagination.order == SortEnum.DESC else asc
@@ -48,7 +69,7 @@ def get_all_prospect(db, pagination):
         .join(Season, Staff.season_id == Season.id)
         .join(StaffRecord, StaffRecord.id == Staff.record_id)
         .filter(Staff.employee == False)
-        .order_by(order(Staff.created_at))
+        .order_by(*build_order_by(pagination, PROSPECT_SORT_MAP, [order(Staff.created_at)], Staff.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
     )
@@ -87,10 +108,10 @@ def search_all_prospect(db, pagination: Pagination, name: str, email: str):
                 Staff.name.op('%')(name),
             )
         )
-        .order_by(
+        .order_by(*build_order_by(pagination, PROSPECT_SORT_MAP, [
             func.similarity(User.email, email).desc(),
             func.similarity(Staff.name, name).desc()
-        )
+        ], Staff.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
     )
@@ -147,7 +168,7 @@ def get_all_staff(db, pagination):
         .join(Season, Staff.season_id == Season.id)
         .join(StaffRecord, StaffRecord.id == Staff.record_id)
         .filter(Staff.employee == True)
-        .order_by(order(Staff.created_at))
+        .order_by(*build_order_by(pagination, STAFF_SORT_MAP, [order(Staff.created_at)], Staff.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
 
@@ -186,12 +207,12 @@ def search_all_staff(db, pagination: Pagination, name: str, lastname_father: str
                Staff.lastname_mother.op('%')(lastname_mother),
             )
         )
-        .order_by(
+        .order_by(*build_order_by(pagination, STAFF_SORT_MAP, [
             func.similarity(User.email, email).desc(),
             func.similarity(Staff.name, name).desc(),
             func.similarity(Staff.lastname_father, lastname_father).desc(),
             func.similarity(Staff.lastname_mother, lastname_mother).desc(),
-        )
+        ], Staff.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
 

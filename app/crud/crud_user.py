@@ -24,7 +24,7 @@ from crud.training.staff_in_training_crud import get_all_staff_training
 from crud.campers.camper_crud import get_campers_in_school
 from crud.campers.parent_crud import create_new_parent_user_id, create_new_parent_user_id_transaction
 from schema.pagination.pagination_schema import Pagination, SortEnum
-from helper.pagination_helpers import get_number_of_pages
+from helper.pagination_helpers import get_number_of_pages, build_order_by
 
 
 ROLE_PARENT_ID = int(os.getenv("ROLE_PARENT_ID"))
@@ -33,6 +33,13 @@ ROLE_SCHOOL_ID = int(os.getenv("ROLE_SCHOOL_ID"))
 ROLE_TEACHER_ID =  int(os.getenv("ROLE_TEACHER_ID"))
 ROLE_DOCTOR_ID = int(os.getenv("ROLE_DOCTOR_ID"))  
 
+
+USER_SORT_MAP = {
+    "email": User.email,
+    "role_name": Role.name,
+    "is_active": User.is_active,
+    "is_superuser": User.is_superuser,
+}
 
 def get_all_user(db, is_active, pagination):
     order = desc if pagination.order == SortEnum.DESC else asc
@@ -55,7 +62,7 @@ def get_all_user(db, is_active, pagination):
         ).filter(
             User.is_active == is_active,
         )
-        .order_by(order(User.created_at))
+        .order_by(*build_order_by(pagination, USER_SORT_MAP, [order(User.created_at)], User.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
     )
@@ -93,9 +100,9 @@ def search_all_user(db, is_active, pagination, email):
         .filter(
             User.email.op('%')(email)
         )
-        .order_by(
+        .order_by(*build_order_by(pagination, USER_SORT_MAP, [
             func.similarity(User.email, email).desc()
-        )
+        ], User.id))
         .limit(pagination.perPage)
         .offset((pagination.offset))
     )
