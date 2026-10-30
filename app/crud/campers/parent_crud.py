@@ -11,7 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from utils.db import db_mapping_rows_to_dict
 from helper.mailing_helpers import send_mail_template
-from helper.pagination_helpers import get_number_of_pages
+from helper.pagination_helpers import get_number_of_pages, build_order_by
 from crud.campers.camper_crud import get_campers_from_parent
 
 import json
@@ -256,6 +256,14 @@ def search_parent_by_name_user(db: Session, search: str):
     return possible_parents
 
 
+PARENT_ADMIN_SORT_MAP = {
+    "tutor_name": func.concat(Parent.tutor_name, ' ', Parent.tutor_lastname_father, ' ', Parent.tutor_lastname_mother),
+    "tutor_cellphone": Parent.tutor_cellphone,
+    "tutor_home_phone": Parent.tutor_home_phone,
+    "tutor_email": User.email,
+    "second_tutor_email": Parent.contact_email,
+}
+
 def get_all_parent_admin(db: Session, pagination):
     order = desc if pagination.order == SortEnum.DESC else asc
     data = []
@@ -274,7 +282,7 @@ def get_all_parent_admin(db: Session, pagination):
         )
         .select_from(Parent)
         .join(User, User.id == Parent.user_id)
-        .order_by(order(Parent.created_at))
+        .order_by(*build_order_by(pagination, PARENT_ADMIN_SORT_MAP, [order(Parent.created_at)], Parent.id))
         .limit(pagination.perPage)
         .offset((pagination.offset)) 
     )
@@ -322,7 +330,7 @@ def search_all_parent_admin(db: Session, pagination, tutor_1_name: str, tutor_1_
                 Parent.contact_email.op('%')(tutor_2_email),
             ) 
         )
-        .order_by(
+        .order_by(*build_order_by(pagination, PARENT_ADMIN_SORT_MAP, [
             func.similarity(User.email, tutor_1_email).desc(),
             func.similarity(Parent.tutor_name, tutor_1_name).desc(),
             func.similarity(Parent.tutor_lastname_father, tutor_1_lastname_father).desc(),
@@ -331,7 +339,7 @@ def search_all_parent_admin(db: Session, pagination, tutor_1_name: str, tutor_1_
             func.similarity(Parent.contact_lastname_father, tutor_2_lastname_father).desc(),
             func.similarity(Parent.contact_lastname_mother, tutor_2_lastname_mother).desc(),
             func.similarity(Parent.contact_email, tutor_2_email).desc()
-        )
+        ], Parent.id))
         .limit(pagination.perPage)
         .offset((pagination.offset)) 
     )

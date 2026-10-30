@@ -65,7 +65,10 @@ def get_email_template_system(db: Session = Depends(get_db)):
 
 @mailing_routes.get("/mailing/campaign/", tags=["Mailing"])
 def get_campaign(db: Session = Depends(get_db)):
-    list_campaign = get_all_campaign(db)
+    list_campaign = [dict(campaign) for campaign in get_all_campaign(db)]
+    for campaign in list_campaign:
+        if campaign["created_at"]:
+            campaign["created_at"] = campaign["created_at"].strftime("%Y/%m/%d - %H:%M:%S")
     return {"data": list_campaign}
 
 @mailing_routes.get("/mailing/camps/", response_model=list[MailingCamps], tags=["Mailing"])
